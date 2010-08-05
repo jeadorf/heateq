@@ -55,10 +55,40 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
         ctx.translate(1, 0)
     ctx.restore()
 
+def plot_2d(t, ctx, x, y, w, h, tmin, tmax):
+    ctx.save()
+    m = len(t)
+    n = len(t[0])
+    ctx.translate(x, y)
+    ctx.scale(1. * w / n, 1. * h / m)
+    # pixel correcture to avoid artifacts due to rounding errors
+    pxw = 1. * n / w
+    pxh = 1. * m / h
+    tspan = tmax - tmin
+    if tspan == 0:
+        tspan = 1
+    for i in xrange(0, m):
+        ctx.save()
+        for j in xrange(0, n):
+            ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
+            c = 1. * (t[i][j] - tmin) / tspan
+            ctx.set_source_rgb(c, 0, 1 - c)
+            ctx.fill()
+            ctx.translate(1, 0)
+        ctx.restore()
+        ctx.translate(0, 1)
+    ctx.restore()
+
 def gen_pdf_1d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 100)
     ctx = cairo.Context(pdf)
     plot_1d(t, ctx, 10, 10, 580, 80, min(t), max(t))
+    pdf.flush()
+
+def gen_pdf_2d(t, filename):
+    pdf = cairo.PDFSurface(filename, 300, 300)
+    ctx = cairo.Context(pdf)
+    plot_2d(t, ctx, 10, 10, 280, 280, 0, 1)
     pdf.flush()
 
 def show_win_1d_stationary(t):
