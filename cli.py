@@ -156,7 +156,13 @@ def main_instationary(opts):
                     opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
-        tplot = plot.TemperaturePlot()
+        tmin = min(opts.tinit)
+        tmax = max(opts.tinit)
+        tmin = min(tmin, opts.te, opts.ts)
+        tmax = max(tmax, opts.te, opts.ts)
+        print tmin
+        print tmax
+        tplot = plot.TemperaturePlot(tmin, tmax)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
