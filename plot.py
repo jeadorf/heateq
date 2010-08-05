@@ -90,7 +90,7 @@ def show_win_1d():
             tc = []
             for t in sol.sim_heateq_1d(ts, te, t_init, 1500, 5, 0.001):
                 if i % 3 == 0:
-                    gobject.idle_add(update, t)
+                    gobject.idle_add(update, copy.copy(t))
                     time.sleep(1./30)
                 i += 1
                 if br:
