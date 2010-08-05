@@ -56,10 +56,10 @@ def fireinthecorner():
 
 
 def main():
-    kochtopf()
-    randomheat()
+    #kochtopf()
+    #randomheat()
     sinfun()
-    fireinthecorner()
+    #fireinthecorner()
 
 if __name__ == "__main__":
     main()
