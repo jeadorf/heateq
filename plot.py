@@ -21,9 +21,10 @@ class TemperaturePlot(gtk.DrawingArea):
         ctx.rectangle(evt.area.x, evt.area.y, evt.area.width, evt.area.height)
         ctx.clip()
         self.redraw(ctx)
-        return False
-    def redraw(self, ctx):
-        ctx = self.window.cairo_create()
+        return True
+    def redraw(self, ctx=None):
+        if ctx == None:
+            ctx = self.window.cairo_create()
         rect = self.get_allocation()
         plot_1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
 

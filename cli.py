@@ -170,7 +170,7 @@ def main_instationary(opts):
 
         def update(t):
             tplot.t = t
-            tplot.redraw(None)
+            tplot.queue_draw()
 
         def run_simulation(): 
             old_wtm = time.time()
