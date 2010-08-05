@@ -9,9 +9,9 @@ import copy
 import time
 import threading
 
-class PlotCanvas(gtk.DrawingArea):
+class TemperaturePlot(gtk.DrawingArea):
     def __init__(self):
-        super(PlotCanvas, self).__init__()
+        super(TemperaturePlot, self).__init__()
         self.connect("expose_event", self.expose)
         self.t = [0, 1]
     def expose(self, widget, evt):
@@ -59,7 +59,7 @@ def show_win_1d_stationary(t):
     win = gtk.Window()
     win.set_title("Temperature curve, n=%d" % (len(t)-2))
     win.set_default_size(800, 100)
-    plot = PlotCanvas()
+    plot = TemperaturePlot()
     plot.t = t
     win.add(plot)
     win.connect("destroy", gtk.main_quit)
@@ -71,7 +71,7 @@ import sys, gobject
 def show_win_1d():
     win = gtk.Window()
     win.set_default_size(800, 100)
-    plot = PlotCanvas()
+    plot = TemperaturePlot()
     win.add(plot)
     win.connect("destroy", gtk.main_quit)
     win.show_all()

@@ -5,6 +5,10 @@ import sol
 import plot
 import optparse
 import copy
+import threading
+import gobject
+import gtk
+import time
 
 def add_stationary_opt(optparser):
     optparser.add_option(
@@ -22,6 +26,16 @@ def add_n_opt(optparser):
         default=10,
         type="int",
         help="Number of interior grid points."
+    )
+
+def add_maxtime_opt(optparser):
+    optparser.add_option(
+        "--maxtime",
+        action="store",
+        dest="maxtime",
+        type="float",
+        default=-1,
+        help="Maximum simulation time."
     )
 
 def add_timestep_opt(optparser):
@@ -42,6 +56,17 @@ def add_locstep_opt(optparser):
         type="float",
         default=10,
         help="Distance between two grid points."
+    )
+
+def add_diffusivity_opt(optparser):
+    optparser.add_option(
+        "-d",
+        "--diffusivity",
+        action="store",
+        dest="diffusivity",
+        type="float",
+        default=1,
+        help="Thermal diffusivity of the simulated area."
     )
 
 def add_ts_opt(optparser):
@@ -74,18 +99,6 @@ def add_tinit_opt(optparser):
         help="Initial temperature at interior grid points."
     )
 
-def add_diffusivity_opt(optparser):
-    optparser.add_option(
-        "-d",
-        "--diffusivity",
-        action="store",
-        dest="diffusivity",
-        type="float",
-        default=1,
-        help="Thermal diffusivity of the simulated area."
-    )
-
-
 def add_pdf_opt(optparser):
     optparser.add_option(
         "--pdf",
@@ -110,36 +123,65 @@ class ExtOption(optparse.Option):
     TYPE_CHECKER = copy.copy(optparse.Option.TYPE_CHECKER)
     TYPE_CHECKER["float_list"] = check_float_list
 
-
 def main():
-    optparser = optparse.OptionParser(option_class=ExtOption)
-    add_stationary_opt(optparser)
-    add_n_opt(optparser)
-    add_timestep_opt(optparser)
-    add_locstep_opt(optparser)
-    add_ts_opt(optparser)
-    add_te_opt(optparser)
-    add_tinit_opt(optparser)
-    add_diffusivity_opt(optparser)
-    add_pdf_opt(optparser)
+    p = optparse.OptionParser(option_class=ExtOption)
+    add_stationary_opt(p)
+    add_n_opt(p)
+    add_maxtime_opt(p)
+    add_timestep_opt(p)
+    add_locstep_opt(p)
+    add_diffusivity_opt(p)
+    add_ts_opt(p)
+    add_te_opt(p)
+    add_tinit_opt(p)
+    add_pdf_opt(p)
 
-    opts, args = optparser.parse_args()
+    opts, args = p.parse_args()
 
     if opts.stationary:
-        t = sol.solve_stationary_1d(opts.ts, opts.te, opts.n)
-        if opts.pdf != None:
-            plot.gen_pdf_1d(t, opts.pdf)
-        else:
-            plot.show_win_1d_stationary(t)
+        main_stationary(opts)
     else:
-        sim = sol.sim_heateq_1d(opts.ts, opts.te, opts.tinit, opts.diffusivity, opts.locstep, opts.timestep)
-        i = 0
-        for t, time in sim:
-            print t
-            print time
-            i += 1
-            if i > 20:
-                break
+        main_instationary(opts)
+
+def main_stationary(opts):
+    t = sol.solve_stationary_1d(opts.ts, opts.te, opts.n)
+    if opts.pdf != None:
+        plot.gen_pdf_1d(t, opts.pdf)
+    else:
+        plot.show_win_1d_stationary(t)
+
+def main_instationary(opts):
+        sim  = sol.sim_heateq_1d(
+                    opts.ts, opts.te, opts.tinit,
+                    opts.diffusivity, opts.locstep, opts.timestep)
+        win = gtk.Window()
+        win.set_default_size(800, 100)
+        tplot = plot.TemperaturePlot()
+        win.add(tplot)
+        win.connect("destroy", gtk.main_quit)
+        win.show_all()
+        stop = False
+
+        def update(t):
+            tplot.t = t
+            tplot.redraw(None)
+
+        def run_simulation(): 
+            old_wtm = time.time()
+            old_tm = 0
+            for t, tm in sim:
+                if time.time() - old_wtm > 1./30:
+                    gobject.idle_add(update, copy.copy(t))
+                    old_wtm = time.time()
+                time.sleep(max(1/100., (tm - old_tm)))
+                old_tm = tm
+                if opts.maxtime >= 0 and tm > opts.maxtime or stop:
+                    break
+
+        gtk.gdk.threads_init()
+        threading.Thread(target=run_simulation).start()
+        gtk.main()
+        stop = True
 
 if __name__ == "__main__":
     main()

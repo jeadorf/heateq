@@ -33,10 +33,10 @@ def solve_stationary_1d_tridiag(ts, te, n):
 def sim_heateq_1d(ts, te, t_init, thermal_diffusivity=1, xstep=30, timestep=0.1):
     n = len(t_init)
     t = copy.copy(t_init)
-    time = 0
+    tm = 0
     xstepsq = 1. * xstep * xstep
     while True:
-        yield ([ts] + t + [te], time)
+        yield ([ts] + t + [te], tm)
         # Compute derivative at all interior grid points
         dt = [ 0 for i in xrange(0, n) ]
         dt[0] = thermal_diffusivity * (ts - 2*t[0] + t[1]) / xstepsq
@@ -46,7 +46,7 @@ def sim_heateq_1d(ts, te, t_init, thermal_diffusivity=1, xstep=30, timestep=0.1)
         # Euler step
         for i in xrange(0, n):
             t[i] += timestep * dt[i]
-        time += timestep
+        tm += timestep
 
 def gen():
     while True:
