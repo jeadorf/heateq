@@ -9,6 +9,7 @@ import threading
 import gobject
 import gtk
 import time
+import sys
 
 def add_stationary_opt(optparser):
     optparser.add_option(
@@ -184,6 +185,8 @@ def main():
     if opts.dimensions == 2:
         if opts.stationary:
             main_stationary_2d(opts)
+        else:
+            main_instationary_2d(opts)
     else:
         if opts.stationary:
             main_stationary_1d(opts)
@@ -250,6 +253,61 @@ def main_stationary_2d(opts):
         plot.show_win_2d_stationary(t)
     else:
         plot.gen_pdf_2d(t, opts.pdf)
+
+def main_instationary_2d(opts):
+        m = opts.m 
+        n = opts.n
+        opts.tinit = [ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ]
+        opts.ttop = [ 0 for j in xrange(0, n) ]
+        opts.tbottom = [ 1 for j in xrange(0, n) ]
+        opts.tleft = [ 0 for i in xrange(0, m) ]
+        opts.tright = [ 0 for i in xrange(0, m) ]
+        win = gtk.Window()
+        win.set_default_size(400, 400)
+        tmin = sys.maxint
+        tmax = -sys.maxint
+        for i in xrange(0, m):
+            tmin = min(tmin, min(opts.tinit[i]))
+            tmax = max(tmax, max(opts.tinit[i]))
+        tmin = min(tmin, min(opts.ttop))
+        tmin = min(tmin, min(opts.tbottom))
+        tmin = min(tmin, min(opts.tleft))
+        tmin = min(tmin, min(opts.tright))
+        tmax = max(tmax, max(opts.ttop))
+        tmax = max(tmax, max(opts.tbottom))
+        tmax = max(tmax, max(opts.tleft))
+        tmax = max(tmax, max(opts.tright))
+        
+        sim = sol.simulate_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, opts.tinit,
+                              opts.diffusivity, opts.locstep, opts.timestep)
+            
+        tplot = plot.TemperaturePlot(tmin, tmax, dim=2)
+        win.add(tplot)
+        win.connect("destroy", gtk.main_quit)
+        win.show_all()
+        stop = False
+
+        def update(t):
+            tplot.t = t
+            tplot.queue_draw()
+
+        def run_simulation(): 
+            old_wtm = time.time()
+            old_tm = 0
+            for t, tm in sim:
+                if time.time() - old_wtm > 1./30:
+                    gobject.idle_add(update, [ copy.copy(t[i]) for i in xrange(0, len(t)) ])
+                    old_wtm = time.time()
+                time.sleep(max(1/100., (tm - old_tm)))
+                old_tm = tm
+                if opts.maxtime >= 0 and tm > opts.maxtime or stop:
+                    break
+
+        gtk.gdk.threads_init()
+        threading.Thread(target=run_simulation).start()
+        gtk.main()
+        stop = True
+
 
 if __name__ == "__main__":
     main()
