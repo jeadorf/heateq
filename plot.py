@@ -45,12 +45,12 @@ def plot_1d(t, ctx, x, y, w, h):
 def main():
     ts, te, n = 5, -5, 300
     t = sol.solve_stationary_1d(ts, te, n)
-    gen_pdf_1d(t)
+    gen_pdf_1d(t, "waermeleitung.pdf")
     # show_win_1d_stationary(t)
     show_win_1d()
 
-def gen_pdf_1d(t):
-    pdf = cairo.PDFSurface("waermeleitung.pdf", 600, 100)
+def gen_pdf_1d(t, filename):
+    pdf = cairo.PDFSurface(filename, 600, 100)
     ctx = cairo.Context(pdf)
     plot_1d(t, ctx, 10, 10, 580, 80)
     pdf.flush()
@@ -88,7 +88,7 @@ def show_win_1d():
             t_init = [0 for i in xrange(0, 10)]
             i = 0
             tc = []
-            for t in sol.sim_heateq_1d(ts, te, t_init, 1500, 5, 0.001):
+            for t, time in sol.sim_heateq_1d(ts, te, t_init, 1500, 5, 0.001):
                 if i % 3 == 0:
                     gobject.idle_add(update, copy.copy(t))
                     time.sleep(1./30)
