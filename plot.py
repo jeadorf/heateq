@@ -27,17 +27,26 @@ class TemperaturePlot(gtk.DrawingArea):
         rect = self.get_allocation()
         plot_1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
 
-def plot_1d(t, ctx, x, y, w, h, tmin, tmax):
+def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
     ctx.translate(x, y)
     n = len(t)
     tspan = tmax - tmin
     if tspan == 0:
         tspan = 1
+    cc = 0
     for i in xrange(0, n):
         ctx.rectangle(0, 0, 1. * w/n + 1, h)
-        l = 1. * (t[i] - tmin) / tspan
-        ctx.set_source_rgb(l, 0, 1 - l)
+        c = 1. * (t[i] - tmin) / tspan
+        if interpolate:
+            grad = cairo.LinearGradient(0, 0, 1. * w/n, 0)
+            if i > 0:
+                grad.add_color_stop_rgb(0, cc, 0, 1 - cc)
+            grad.add_color_stop_rgb(1, c, 0, 1 - c)
+            cc = c
+            ctx.set_source(grad)
+        else:
+            ctx.set_source_rgb(c, 0, 1 - c)
         ctx.fill()
         ctx.translate(1. * w/n, 0)
     ctx.restore()

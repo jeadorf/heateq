@@ -152,8 +152,8 @@ def main_stationary(opts):
 
 def main_instationary(opts):
         sim  = sol.sim_heateq_1d(
-                    opts.ts, opts.te, opts.tinit,
-                    opts.diffusivity, opts.locstep, opts.timestep)
+                (lambda tm: opts.te), (lambda tm: opts.ts), opts.tinit,
+                opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
         tmin = min(opts.tinit)
