@@ -42,13 +42,6 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax):
         ctx.translate(1. * w/n, 0)
     ctx.restore()
 
-def main():
-    ts, te, n = 5, -5, 300
-    t = sol.solve_stationary_1d(ts, te, n)
-    gen_pdf_1d(t, "waermeleitung.pdf")
-    # show_win_1d_stationary(t)
-    show_win_1d()
-
 def gen_pdf_1d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 100)
     ctx = cairo.Context(pdf)
@@ -65,43 +58,6 @@ def show_win_1d_stationary(t):
     win.connect("destroy", gtk.main_quit)
     win.show_all()
     gtk.main()
-
-import sys, gobject
-
-def show_win_1d():
-    win = gtk.Window()
-    win.set_default_size(800, 100)
-    plot = TemperaturePlot(0, 5)
-    win.add(plot)
-    win.connect("destroy", gtk.main_quit)
-    win.show_all()
-
-    def update(t):
-        plot.t = t
-        plot.redraw(None)
-
-    br = False
-    class SimThread(threading.Thread):
-        def run(self):
-            ts = 5
-            te = 0
-            t_init = [0 for i in xrange(0, 10)]
-            i = 0
-            tc = []
-            for t, time in sol.sim_heateq_1d(ts, te, t_init, 1500, 5, 0.001):
-                if i % 3 == 0:
-                    gobject.idle_add(update, copy.copy(t))
-                    time.sleep(1./30)
-                i += 1
-                if br:
-                    break
-
-    gtk.gdk.threads_init()
-    simthread = SimThread()
-    simthread.start()
-
-    gtk.main()
-    br = True
 
 if __name__ == "__main__":
     main()
