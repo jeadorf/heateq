@@ -12,24 +12,6 @@ def solve_stationary_1d(ts, te, n):
     at the boundaries."""
     return [ 1. * ts + 1. * i * (te - ts) / (n + 1) for i in xrange(0, n+2)]
 
-def solve_stationary_1d_tridiag(ts, te, n):
-    """Same as solve_stationary_1d, just using a tridiagonal system solver."""
-    assert n > 1
-    d1 = tridiag.Diag(1)
-    d2 = tridiag.Diag(-2)
-    d3 = tridiag.Diag(1)
-    class BVector:
-        def __getitem__(self, i):
-            if i == 0:
-                return -ts
-            elif i == n - 1:
-                return -te
-            else:
-                return 0
-    b = BVector()
-    t = tridiag.solve(d1, d2, d3, b, n)
-    return [ts] + t + [te]
-
 def sim_heateq_1d(ts, te, t_init, thermal_diffusivity=1, xstep=30, timestep=0.1):
     n = len(t_init)
     t = copy.copy(t_init)
