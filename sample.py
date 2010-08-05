@@ -7,6 +7,7 @@ import random
 import math
 
 def kochtopf():
+    print "generating 'kochtopf'"
     m = 20 
     n = 40
     ttop = [0 for j in xrange(0, n) ]
@@ -17,6 +18,7 @@ def kochtopf():
     plot.gen_pdf_2d(t, "kochtopf.pdf")
 
 def randomheat():
+    print "generating 'randomheat'"
     m = 20 
     n = 40
     ttop = [random.uniform(0, 1) for j in xrange(0, n) ]
@@ -27,8 +29,9 @@ def randomheat():
     plot.gen_pdf_2d(t, "randomheat.pdf")
 
 def sinfun():
-    m = 40 
-    n = 40
+    print "generating 'sinfun'"
+    m = 50 
+    n = 50
     ttop = [math.sin(math.pi * j / n) for j in xrange(0, n) ]
     tbottom = [math.sin(math.pi * j / n) for j in xrange(0, n) ]
     tleft = [math.sin(math.pi * (i + n/3) / n) for i in xrange(0, m) ]
@@ -37,8 +40,9 @@ def sinfun():
     plot.gen_pdf_2d(t, "sinfun.pdf")
 
 def fireinthecorner():
-    m = 15 
-    n = 15
+    print "generating 'fireintecorner'"
+    m = 10
+    n = 10
     ttop = ([1 for j in xrange(0, n) ] +
            [0 for j in xrange(0, n) ] +
            [1 for j in xrange(0, n) ])
@@ -56,10 +60,10 @@ def fireinthecorner():
 
 
 def main():
-    #kochtopf()
-    #randomheat()
+    kochtopf()
+    randomheat()
     sinfun()
-    #fireinthecorner()
+    fireinthecorner()
 
 if __name__ == "__main__":
     main()

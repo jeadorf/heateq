@@ -237,12 +237,19 @@ def main_instationary_1d(opts):
 def main_stationary_2d(opts):
     m = opts.m 
     n = opts.n
-    t_top = [0 for j in xrange(0, n) ]
-    t_bottom = [1 for j in xrange(0, n) ]
-    t_left = [0 for i in xrange(0, m) ]
-    t_right = [0 for i in xrange(0, m) ]
+    if len(opts.ttop) < n:
+        opts.ttop = [0 for j in xrange(0, n)]
+    if len(opts.tbottom) < n:
+        opts.tbottom = [1 for j in xrange(0, n)]
+    if len(opts.tleft) < m:
+        opts.tleft = [0 for i in xrange(0, m)]
+    if len(opts.tright) < m:
+        opts.tright = [0 for i in xrange(0, m)]
     t = sol.solve_stationary_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, m, n)
-    plot.gen_pdf_2d(t, "waermeleitung2d.pdf")
+    if opts.pdf == None:
+        plot.show_win_2d_stationary(t)
+    else:
+        plot.gen_pdf_2d(t, opts.pdf)
 
 if __name__ == "__main__":
     main()
