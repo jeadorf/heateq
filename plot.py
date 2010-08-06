@@ -4,12 +4,11 @@
 import cairo
 import gtk
 import sol
-import math
-import copy
 import sys
 import numpy
 
 class TemperaturePlot(gtk.DrawingArea):
+
     def __init__(self, tmin, tmax, dim=1):
         super(TemperaturePlot, self).__init__()
         self.connect("expose_event", self.expose)
@@ -17,15 +16,17 @@ class TemperaturePlot(gtk.DrawingArea):
         self.tmax = tmax
         self.dim = dim
         if self.dim == 2:
-            self.t = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+            self.t = numpy.zeros((1, 1))
         else:
-            self.t = [0, 1]
+            self.t = numpy.zeros((1,))
+
     def expose(self, widget, evt):
         ctx = widget.window.cairo_create()
         ctx.rectangle(evt.area.x, evt.area.y, evt.area.width, evt.area.height)
         ctx.clip()
         self.redraw(ctx)
         return True
+
     def redraw(self, ctx=None):
         if ctx == None:
             ctx = self.window.cairo_create()
@@ -34,6 +35,7 @@ class TemperaturePlot(gtk.DrawingArea):
             plot_2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
         else:
             plot_1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
+
 
 def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
@@ -64,8 +66,6 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
 
 def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
-    # todo: workaround
-    t = numpy.array(t)
     m = len(t)
     n = len(t[0])
     ctx.translate(x, y)

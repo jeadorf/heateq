@@ -10,6 +10,7 @@ import gobject
 import gtk
 import time
 import sys
+import math
 
 def add_stationary_opt(optparser):
     optparser.add_option(
@@ -225,7 +226,7 @@ def main_instationary_1d(opts):
             old_tm = 0
             for t, tm in sim:
                 if time.time() - old_wtm > 1./30:
-                    gobject.idle_add(update, copy.copy(t))
+                    gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
                 time.sleep(max(1/100., (tm - old_tm)))
                 old_tm = tm
@@ -253,7 +254,7 @@ def main_stationary_2d(opts):
         plot.show_win_2d_stationary(t)
     else:
         plot.gen_pdf_2d(t, opts.pdf)
-import math
+
 def main_instationary_2d(opts):
         m = opts.m
         n = opts.n
@@ -264,6 +265,7 @@ def main_instationary_2d(opts):
         opts.tright = [ math.sin( 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ]
         win = gtk.Window()
         win.set_default_size(400, 400)
+        # todo: find better procedure to find tmin and tmax
         tmin = sys.maxint
         tmax = -sys.maxint
         for i in xrange(0, m):
@@ -296,7 +298,7 @@ def main_instationary_2d(opts):
             old_tm = 0
             for t, tm in sim:
                 if time.time() - old_wtm > .5:
-                    gobject.idle_add(update, [ copy.copy(t[i]) for i in xrange(0, len(t)) ])
+                    gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
                 time.sleep(max(1/100., (tm - old_tm)))
                 old_tm = tm

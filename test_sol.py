@@ -23,14 +23,14 @@ def test_if_simulate_1d_converges():
     assert abs(t[1]) < eps
 
 def test_generate_matrix_2d():
-    a = numpy.matrix(
+    a = numpy.array(
         [[-4,  1,  0,  1,  0,  0],
          [ 1, -4,  1,  0,  1,  0],
          [ 0,  1, -4,  0,  0,  1],
          [ 1,  0,  0, -4,  1,  0],
          [ 0,  1,  0,  1, -4,  1],
          [ 0,  0,  1,  0,  1, -4]])
-    c = numpy.matrix([[ generate_matrix_2d(i, j, 2, 3) for j in xrange(0, 6)] for i in xrange(0, 6) ])
+    c = numpy.array([[ generate_matrix_2d(i, j, 2, 3) for j in xrange(0, 6)] for i in xrange(0, 6) ])
     assert (a == c).all()
 
 def test_generate_b_2d():
@@ -38,7 +38,7 @@ def test_generate_b_2d():
     tb_bottom = [7, 9, 10]
     tb_left = [4, 6]
     tb_right = [5, 11]
-    b = numpy.matrix([generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, 2, 3) for i in xrange(0, 6)])
-    exp = numpy.matrix([-5, -2, -8, -13, -9, -21])
+    b = numpy.array([generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, 2, 3) for i in xrange(0, 6)])
+    exp = numpy.array([-5, -2, -8, -13, -9, -21])
     assert (b == exp).all()
 
