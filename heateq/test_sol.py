@@ -21,17 +21,18 @@ def test_init_conds_2d():
     assert (ic.left(1) == 5 * b).all()
 
 def test_solve_stationary_1d():
-    ts, te, n = 5, -5, 3
-    t = solve_stationary_1d(ts, te, n)
-    assert t[0] == ts
+    initconds = InitConds1d(5, const(5), const(-5))
+    t = solve_stationary_1d(initconds)
+    assert t[0] == 5 
     assert abs(t[2]) < eps
-    assert t[n+1] == te
+    assert t[-1] == -5
 
 def test_if_simulate_1d_converges():
     ts, te = 5, -5
     t = None
     maxtm = 500
-    for tt, tm in simulate_1d((lambda tm: ts), (lambda tm: te), [0, 0.2, 0.3], 300):
+    initconds = InitConds1d(3, const(5), const(-5), numpy.array([0, 0.2, 0.3]))
+    for tt, tm in simulate_1d(initconds, 300):
         t = tt
         if tm > maxtm:
             break

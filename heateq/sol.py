@@ -34,18 +34,41 @@ class InitConds2d:
     def shape(self):
         return self.m, self.n
 
+class InitConds1d:
+
+    def __init__(self, n, left=None, right=None, interior=None):
+        self.n = n
+        if right == None:
+            self.right = const(0)
+        else:
+            self.right = right
+        if left == None:
+            self.left = const(0)
+        else:
+            self.left = left
+        if interior == None:
+            self.interior = numpy.zeros((n,))
+        else:
+            self.interior = interior
+ 
+
 def const(val):
     return (lambda tm: val)
 
-def solve_stationary_1d(ts, te, n):
+def solve_stationary_1d(initconds):
     """Solves the stationary heat equation in one dimension.  The Dirichlet
     boundary conditions are given by values ts and te, describing the constant
     temperature values at grid points 0 and n+1.  The number of interior grid
     points is n > 1. Returns an array with n+2 elements, including the values
     at the boundaries."""
-    return numpy.linspace(ts, te, n+2)
+    return numpy.linspace(initconds.left(0), initconds.right(0), initconds.n)
 
-def solve_stationary_2d(ttop, tbottom, tleft, tright, m, n):
+def solve_stationary_2d(initconds):
+    m, n = initconds.m, initconds.n
+    ttop = initconds.top(0)
+    tright = initconds.right(0)
+    tbottom = initconds.bottom(0)
+    tleft = initconds.left(0)
     a = numpy.empty((m*n, m*n))
     b = numpy.empty((m*n,))
     for i in xrange(0, m*n):
@@ -77,20 +100,22 @@ def generate_b_2d(i, ttop, tbottom, tleft, tright, m, n):
         b -= tright[r]
     return b
 
-def simulate_1d(ts, te, tinit, diffy=1, delx=30, delt=0.1):
-    n = len(tinit)
+def simulate_1d(initconds, diffy=1, delx=30, delt=0.1):
+    n = initconds.n
     assert n > 1
-    t = numpy.array(tinit)
+    t = initconds.interior.copy()
     tm = 0
     delx2 = 1. * delx * delx
     dt = numpy.empty((n,))
+    left = initconds.left
+    right = initconds.right
     while True:
         yield t, tm
         # compute derivative
-        dt[0] = diffy * (ts(tm) - 2*t[0] + t[1]) / delx2
+        dt[0] = diffy * (left(tm) - 2*t[0] + t[1]) / delx2
         for i in xrange(1, n-1):
             dt[i] = diffy * (t[i-1] - 2*t[i] + t[i+1]) / delx2
-        dt[n-1] = diffy * (t[n-2] - 2*t[n-1] + te(tm)) / delx2
+        dt[n-1] = diffy * (t[n-2] - 2*t[n-1] + right(tm)) / delx2
         # Euler
         t = t + delt * dt
         tm += delt
