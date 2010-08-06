@@ -6,7 +6,7 @@ import gtk
 import sol
 import sys
 import numpy
-import heateq_plot2d
+import heateqplot
 
 class TemperaturePlot(gtk.DrawingArea):
 
@@ -66,7 +66,7 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.restore()
 
 # Expose C extension
-plot_2d = plot2d.plot2d
+plot_2d = heateqplot.plot2d
 
 def gen_pdf_1d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 100)

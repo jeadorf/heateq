@@ -2,11 +2,11 @@ import setuptools
 from distutils.core import Extension
 import numpy
 
-m1 = Extension('heateq_laplace2d',
-                    sources = ['heateq/laplace2d.c'])
-m2 = Extension('heateq_plot2d',
+m1 = Extension('heateqlapl',
+                    sources = ['heateq/heateqlapl.c'])
+m2 = Extension('heateqplot',
                     libraries=["cairo"],
-                    sources = ['heateq/plot2d.c'])
+                    sources = ['heateq/heateqplot.c'])
 
 setuptools.setup(name = 'Heateq',
       author='Julius Adorf',

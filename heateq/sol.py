@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy
+import heateqlapl
 
 class InitConds:
     
@@ -66,8 +67,6 @@ def simulate_1d(ts, te, tinit, diffy=1, delx=30, delt=0.1):
         t = t + delt * dt
         tm += delt
 
-import heateq_laplace2d
-
 def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1):
     m = len(tinit)
     n = len(tinit[0])
@@ -81,7 +80,7 @@ def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1
     while True:
         yield t, tm
         # Calculate second derivative
-        heateq_laplace2d.apply(t, dt, ttop(tm), tbottom(tm), tleft(tm), tright(tm))
+        heateqlapl.apply(t, dt, ttop(tm), tbottom(tm), tleft(tm), tright(tm))
         # Euler
         t = t + (1. * delt * diffy / delx2) * dt
         tm += delt
