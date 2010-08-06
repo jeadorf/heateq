@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from sol import *
+import time
 
 eps = 1.e-8
 
@@ -42,3 +43,20 @@ def test_generate_b_2d():
     exp = numpy.array([-5, -2, -8, -13, -9, -21])
     assert (b == exp).all()
 
+def test_speed_2d():
+    st = time.clock()
+    m, n = 50, 50
+    ttop = numpy.zeros((n,))
+    tbottom = numpy.ones((n,))
+    tleft = numpy.zeros((m,))
+    tright = numpy.zeros((m,))
+    tinit = numpy.zeros((m,n))
+    i = 0
+    for t in simulate_2d(ttop, tbottom, tleft, tright, tinit):
+        i += 1
+        if i >= 20:
+            break
+    ct = time.clock()
+    print "time=%.3fs,steps=%d,fps=%.2f" % (ct - st, i, i / (ct -st))
+
+    

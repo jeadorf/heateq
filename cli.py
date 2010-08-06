@@ -11,6 +11,7 @@ import gtk
 import time
 import sys
 import math
+import numpy
 
 def add_stationary_opt(optparser):
     optparser.add_option(
@@ -95,7 +96,7 @@ def add_tleft_opt(optparser):
         "--tleft",
         action="store",
         dest="tleft",
-        type="float_list",
+        type="ndarray",
         default=[1],
         help="Temperature values at the left boundary."
     )
@@ -105,7 +106,7 @@ def add_tright_opt(optparser):
         "--tright",
         action="store",
         dest="tright",
-        type="float_list",
+        type="ndarray",
         default=[-1],
         help="Temperature values at the right boundary."
     )
@@ -115,7 +116,7 @@ def add_ttop_opt(optparser):
         "--ttop",
         action="store",
         dest="ttop",
-        type="float_list",
+        type="ndarray",
         default=[-1],
         help="Temperature values at the upper boundary."
     )
@@ -125,7 +126,7 @@ def add_tbottom_opt(optparser):
         "--tbottom",
         action="store",
         dest="tbottom",
-        type="float_list",
+        type="ndarray",
         default=[1],
         help="Temperature values at the lower boundary."
     )
@@ -135,7 +136,7 @@ def add_tinit_opt(optparser):
         "--tinit",
         action="store",
         dest="tinit",
-        type="float_list",
+        type="ndarray",
         default=[0, 0, 0],
         help="Initial temperature at interior grid points."
     )
@@ -149,20 +150,17 @@ def add_pdf_opt(optparser):
     )
 
 
-def check_float_list(option, opt, value):
+def check_ndarray(option, opt, value):
     try:
-        lst = []
-        for v in value.split(","):
-            lst.append(float(v))
-        return lst
+        return numpy.fromstring(value, sep=",")
     except ValueError:
         raise optparse.OptionValueError(
-            "option %s: invalid float list value: %r" % (opt, value))
+            "option %s: invalid ndarray value: %r" % (opt, value))
 
 class ExtOption(optparse.Option):
-    TYPES = optparse.Option.TYPES + ("float_list",)
+    TYPES = optparse.Option.TYPES + ("ndarray",)
     TYPE_CHECKER = copy.copy(optparse.Option.TYPE_CHECKER)
-    TYPE_CHECKER["float_list"] = check_float_list
+    TYPE_CHECKER["ndarray"] = check_ndarray
 
 def main():
     p = optparse.OptionParser(option_class=ExtOption)
@@ -242,13 +240,13 @@ def main_stationary_2d(opts):
     m = opts.m
     n = opts.n
     if len(opts.ttop) < n:
-        opts.ttop = [0 for j in xrange(0, n)]
+        opts.ttop = numpy.zeros((n,))
     if len(opts.tbottom) < n:
-        opts.tbottom = [1 for j in xrange(0, n)]
+        opts.tbottom = numpy.ones((n,))
     if len(opts.tleft) < m:
-        opts.tleft = [0 for i in xrange(0, m)]
+        opts.tleft = numpy.zeros((m,))
     if len(opts.tright) < m:
-        opts.tright = [0 for i in xrange(0, m)]
+        opts.tright = numpy.zeros((m,))
     t = sol.solve_stationary_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, m, n)
     if opts.pdf == None:
         plot.show_win_2d_stationary(t)
@@ -258,27 +256,17 @@ def main_stationary_2d(opts):
 def main_instationary_2d(opts):
         m = opts.m
         n = opts.n
-        opts.tinit = [ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ]
-        opts.ttop = [ math.sin(0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ]
-        opts.tbottom = [ math.sin(- 0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ]
-        opts.tleft = [ math.sin(- 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ]
-        opts.tright = [ math.sin( 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ]
+        opts.tinit = numpy.array([ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ])
+        opts.ttop = numpy.array([ math.sin(0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
+        opts.tbottom = numpy.array([ math.sin(- 0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
+        opts.tleft = numpy.array([ math.sin(- 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
+        opts.tright = numpy.array([ math.sin( 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
         win = gtk.Window()
         win.set_default_size(400, 400)
+        
         # todo: find better procedure to find tmin and tmax
-        tmin = sys.maxint
-        tmax = -sys.maxint
-        for i in xrange(0, m):
-            tmin = min(tmin, min(opts.tinit[i]))
-            tmax = max(tmax, max(opts.tinit[i]))
-        tmin = min(tmin, min(opts.ttop))
-        tmin = min(tmin, min(opts.tbottom))
-        tmin = min(tmin, min(opts.tleft))
-        tmin = min(tmin, min(opts.tright))
-        tmax = max(tmax, max(opts.ttop))
-        tmax = max(tmax, max(opts.tbottom))
-        tmax = max(tmax, max(opts.tleft))
-        tmax = max(tmax, max(opts.tright))
+        tmin = min(opts.tinit.min(), opts.ttop.min(), opts.tbottom.min(), opts.tleft.min(), opts.tright.min())
+        tmax = max(opts.tinit.max(), opts.ttop.max(), opts.tbottom.max(), opts.tleft.max(), opts.tright.max())
 
         sim = sol.simulate_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, opts.tinit,
                               opts.diffusivity, opts.locstep, opts.timestep)

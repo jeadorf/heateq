@@ -74,18 +74,14 @@ def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1
     while True:
         yield t, tm
         # compute derivative
-        dt[0, 0] = diffy * (ttop[0] + t[1, 0] + tleft[0] + t[0, 1] - 4*t[0, 0]) / delx2
+        dt[0, 0] = diffy * (ttop[0] + t[1, 0] + tleft[0] + t[0, 1] - 4 * t[0, 0]) / delx2
         for j in xrange(1, n-1):
-            dt[0, j] = diffy * (ttop[j] + t[1, j] + t[0, j-1] + t[0, j+1]- 4*t[0, j]) / delx2
-        dt[0, n-1] = diffy * (ttop[n-1] + t[1, n-1] + t[0, n-2] + tright[0]- 4*t[0, n-1]) / delx2
+            dt[0, j] = diffy * (ttop[j] + t[1, j] + t[0, j-1] + t[0, j+1] - 4*t[0, j]) / delx2
+        dt[0, n-1] = diffy * (ttop[n-1] + t[1, n-1] + t[0, n-2] + tright[0] - 4*t[0, n-1]) / delx2
         for i in xrange(1, m-1):
             dt[i, 0] = diffy * (t[i-1, 0] + t[i+1, 0] + tleft[i] + t[i, 1] - 4*t[i, 0]) / delx2
             for j in xrange(1, n-1):
-                nt = t[i-1, j]
-                nb = t[i+1, j]
-                nl = t[i, j-1]
-                nr = t[i, j+1]
-                dt[i, j] = diffy * (nt + nb + nl + nr - 4*t[i, j]) / delx2
+               dt[i, j] = diffy * (t[i-1, j] + t[i+1, j] + t[i, j-1] + t[i, j+1] - 4*t[i, j]) / delx2
             dt[i, n-1] = diffy * (t[i-1, n-1] + t[i+1, n-1] + t[i, n-2] + tright[i] - 4*t[i, n-1]) / delx2
         dt[m-1, 0] = diffy * (t[m-1, 0] + tbottom[0] + tleft[0] + t[m-1, 1] - 4*t[m-1, 0]) / delx2
         for j in xrange(1, n-1):
