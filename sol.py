@@ -10,7 +10,7 @@ def solve_stationary_1d(ts, te, n):
     temperature values at grid points 0 and n+1.  The number of interior grid
     points is n > 1. Returns an array with n+2 elements, including the values
     at the boundaries."""
-    return numpy.array([ 1. * ts + 1. * i * (te - ts) / (n + 1) for i in xrange(0, n+2)])
+    return numpy.linspace(ts, te, n+2)
 
 def solve_stationary_2d(tb_top, tb_bottom, tb_left, tb_right, m, n):
     a = numpy.empty((m*n, n*n))
