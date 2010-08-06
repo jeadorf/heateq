@@ -38,7 +38,7 @@ def test_if_simulate_1d_converges():
             break
     assert abs(t[1]) < eps
 
-def test_generate_matrix_2d():
+def test_laplacian():
     a = numpy.array(
         [[-4,  1,  0,  1,  0,  0],
          [ 1, -4,  1,  0,  1,  0],
@@ -46,15 +46,15 @@ def test_generate_matrix_2d():
          [ 1,  0,  0, -4,  1,  0],
          [ 0,  1,  0,  1, -4,  1],
          [ 0,  0,  1,  0,  1, -4]])
-    c = numpy.array([[ generate_matrix_2d(i, j, 2, 3) for j in xrange(0, 6)] for i in xrange(0, 6) ])
+    c = laplacian(2, 3)
     assert (a == c).all()
 
-def test_generate_b_2d():
+def test_laplacian_b():
     tb_top = [1, 2, 3]
     tb_bottom = [7, 9, 10]
     tb_left = [4, 6]
     tb_right = [5, 11]
-    b = numpy.array([generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, 2, 3) for i in xrange(0, 6)])
+    b = laplacian_b(tb_top, tb_bottom, tb_left, tb_right, 2, 3)
     exp = numpy.array([-5, -2, -8, -13, -9, -21])
     assert (b == exp).all()
 
@@ -82,10 +82,7 @@ def test_speed_2d():
 def test_laplace2d():
     m = 3
     n = 4 
-    a = numpy.empty((m*n, m*n))
-    for i in xrange(0, m*n):
-        for j in xrange(0, m*n):
-            a[i, j] = generate_matrix_2d(i, j, m, n)
+    a = laplacian(m, n)
     t = numpy.array([
         [4, 1, 0, 0],
         [3, 1, 0, 5],

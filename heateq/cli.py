@@ -295,7 +295,7 @@ def main_instationary_2d(opts):
                     gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
                 if i > 150:
-                    time.sleep(50) #max(1/100, (tm - old_tm)))
+                    time.sleep(50)
                     i = 0
                 old_tm = tm
                 if opts.maxtime >= 0 and tm > opts.maxtime or stop:

@@ -69,35 +69,38 @@ def solve_stationary_2d(initconds):
     tright = initconds.right(0)
     tbottom = initconds.bottom(0)
     tleft = initconds.left(0)
-    a = numpy.empty((m*n, m*n))
-    b = numpy.empty((m*n,))
-    for i in xrange(0, m*n):
-        for j in xrange(0, m*n):
-            a[i, j] = generate_matrix_2d(i, j, m, n)
-        b[i] = generate_b_2d(i, ttop, tbottom, tleft, tright, m, n)
+    a = laplacian(m, n)
+    b = laplacian_b(ttop, tbottom, tleft, tright, m, n)
     x = numpy.linalg.solve(a, b)
     return x.reshape(m, n)
 
-def generate_matrix_2d(i, j, m, n):
-    if i == j:
-        return -4
-    elif abs(i / n - j / n) + abs(i % n - j % n) == 1:
-        return 1
-    else:
-        return 0
+def laplacian(m, n):
+    a = numpy.empty((m*n, m*n))
+    for i in xrange(0, m*n):
+        for j in xrange(0, m*n):
+            if i == j:
+                a[i, j] = -4
+            elif abs(i / n - j / n) + abs(i % n - j % n) == 1:
+                a[i, j] = 1
+            else:
+                a[i, j] = 0
+    return a
 
-def generate_b_2d(i, ttop, tbottom, tleft, tright, m, n):
-    r = i / n
-    c = i % n
-    b = 0
-    if r == 0:
-        b -= ttop[c]
-    elif r == m - 1:
-        b -= tbottom[c]
-    if c == 0:
-        b -= tleft[r]
-    elif c == n - 1:
-        b -= tright[r]
+def laplacian_b(ttop, tbottom, tleft, tright, m, n):
+    b = numpy.empty((m*n,))
+    for i in xrange(0, m*n):
+        r = i / n
+        c = i % n
+        v = 0
+        if r == 0:
+            v -= ttop[c]
+        elif r == m - 1:
+            v -= tbottom[c]
+        if c == 0:
+            v -= tleft[r]
+        elif c == n - 1:
+            v -= tright[r]
+        b[i] = v
     return b
 
 def simulate_1d(initconds, diffy=1, delx=30, delt=0.1):
