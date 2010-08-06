@@ -3,6 +3,7 @@
 
 from sol import *
 import time
+import laplace2d
 
 eps = 1.e-8
 
@@ -59,4 +60,28 @@ def test_speed_2d():
     ct = time.clock()
     print "time=%.3fs,steps=%d,fps=%.2f" % (ct - st, i, i / (ct -st))
 
-    
+def test_laplace2d():
+    m = 3
+    n = 4 
+    a = numpy.empty((m*n, m*n))
+    for i in xrange(0, m*n):
+        for j in xrange(0, m*n):
+            a[i, j] = generate_matrix_2d(i, j, m, n)
+    t = numpy.array([
+        [4, 1, 0, 0],
+        [3, 1, 0, 5],
+        [0, -2, 1, 0]] , dtype=numpy.double)
+    ttop = numpy.zeros((n,))
+    tbottom = numpy.zeros((n,))
+    tleft = numpy.zeros((m,))
+    tright = numpy.zeros((m,))
+    print "---------  a  ------------"
+    print a 
+    txx = numpy.zeros((m, n), dtype=numpy.double)
+    laplace2d.apply(t, txx, ttop, tbottom, tleft, tright)
+    print "--------- txx ------------"
+    print txx
+    exp = numpy.dot(a, t.reshape((m*n, 1)))
+    print "--------- exp ------------"
+    print exp.reshape((m, n))
+    assert False 

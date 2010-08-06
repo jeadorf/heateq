@@ -12,7 +12,7 @@ def solve_stationary_1d(ts, te, n):
     return numpy.linspace(ts, te, n+2)
 
 def solve_stationary_2d(ttop, tbottom, tleft, tright, m, n):
-    a = numpy.empty((m*n, n*n))
+    a = numpy.empty((m*n, m*n))
     b = numpy.empty((m*n,))
     for i in xrange(0, m*n):
         for j in xrange(0, m*n):
