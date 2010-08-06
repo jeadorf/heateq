@@ -65,86 +65,8 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
         ctx.translate(1, 0)
     ctx.restore()
 
-def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
-    ctx.save()
-    m = len(t)
-    n = len(t[0])
-    ctx.translate(x, y)
-    ctx.scale(1. * w / n, 1. * h / m)
-    # pixel correcture to avoid artifacts due to rounding errors
-    pxw = .5 * n / w
-    pxh = .5 * m / h
-    tspan = tmax - tmin
-    if tspan == 0:
-        tspan = 1
-    if interpolate:
-        ctx.rectangle(0.5, 0, 0.5+pxw, 0.5+pxh)
-        r1 = ctx.copy_path()
-        ctx.new_path()
-        ctx.rectangle(0.0, 0.0, 0.5+pxw, 0.5+pxh)
-        r2 = ctx.copy_path()
-        ctx.new_path()
-        ctx.rectangle(0.0, 0.5, 0.5+pxw, 0.5+pxh)
-        r3 = ctx.copy_path()
-        ctx.new_path()
-        ctx.rectangle(0.5, 0.5, 0.5+pxw, 0.5+pxh)
-        r4 = ctx.copy_path()
-        ctx.new_path()
-        ctx.rectangle(0, 0, 1 + 2*pxw, 1 + 2*pxh)
-    r0 = ctx.copy_path()
-    ctx.new_path()
-    fill = ctx.fill
-    set_source = ctx.set_source
-    append_path = ctx.append_path
-    interpolate = False 
-    for i in xrange(0, m):
-        ctx.save()
-        for j in xrange(0, n):
-            c = 1. * (t[i, j] - tmin) / tspan
-            append_path(r0)
-            ctx.set_source_rgb(c, 0, 1 - c)
-            fill()
-            if interpolate:
-                if i > 0 and j < n - 1:
-                    c1 = 1. * (t[i-1, j+1] - tmin) / tspan
-                    g1 = cairo.LinearGradient(0, 0, 1, -1)
-                    g1.add_color_stop_rgb(0, c, 0, 1 - c)
-                    g1.add_color_stop_rgb(1, c1, 0, 1 - c1)
-                    # ctx.rectangle(0.5, 0, 0.5+pxw, 0.5+pxh)
-                    append_path(r1)
-                    set_source(g1)
-                    fill()
-                if i > 0 and j > 0:
-                    c2 = 1. * (t[i-1, j-1] - tmin) / tspan
-                    g2 = cairo.LinearGradient(0, 0, -1, -1)
-                    g2.add_color_stop_rgb(0, c, 0, 1 - c)
-                    g2.add_color_stop_rgb(1, c2, 0, 1 - c2)
-                    #ctx.rectangle(0.0, 0.0, 0.5+pxw, 0.5+pxh)
-                    append_path(r2)
-                    set_source(g2)
-                    fill()
-                if i < m -1 and j > 0:
-                    c3 = 1. * (t[i+1, j-1] - tmin) / tspan
-                    g3 = cairo.LinearGradient(0, 0, -1, 1)
-                    g3.add_color_stop_rgb(0, c, 0, 1 - c)
-                    g3.add_color_stop_rgb(1, c3, 0, 1 - c3)
-                    #ctx.rectangle(0.0, 0.5, 0.5+pxw, 0.5+pxh)
-                    append_path(r3)
-                    set_source(g3)
-                    fill()
-                if i < m -1 and j < n - 1:
-                    c4 = 1. * (t[i+1, j+1] - tmin) / tspan
-                    g4 = cairo.LinearGradient(0, 0, 1, 1)
-                    g4.add_color_stop_rgb(0, c, 0, 1 - c)
-                    g4.add_color_stop_rgb(1, c4, 0, 1 - c4)
-                    # ctx.rectangle(0.5, 0.5, 0.5+pxw, 0.5+pxh)
-                    append_path(r4)
-                    set_source(g4)
-                    fill()
-            ctx.translate(1, 0)
-        ctx.restore()
-        ctx.translate(0, 1)
-    ctx.restore()
+# Expose C extension
+plot_2d = plot2d.plot2d
 
 def gen_pdf_1d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 100)

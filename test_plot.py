@@ -7,6 +7,7 @@ import time
 import sol
 import numpy
 import cairo
+from plot import *
 
 def test_plot2d_speed():
     m, n = 30, 30
@@ -19,23 +20,21 @@ def test_plot2d_speed():
     imsf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
     ctx = cairo.Context(imsf)
     i = 0
-    stc = time.clock()
+    st = time.clock()
     for t, tm in sol.simulate_2d(ttop, tbottom, tleft, tright, tinit):
         i += 1
-        plot.plot_2d(t, ctx, 0, 0, 400, 400, 0, 1, False)
+        plot_2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:
             break
-    ctc = time.clock()
-    i = 0
-    stp = time.clock()
-    for t, tm in sol.simulate_2d(ttop, tbottom, tleft, tright, tinit):
-        i += 1
-        plot2d.plot2d(t, ctx, 0, 0, 400, 400, 0, 1, False)
-        if i >= max:
-            break
-    ctp = time.clock()
-    print "Python time=%.3fs" % (ctc - stc)
-    print "C Ext. time=%.3fs" % (ctp - stp)
+    ct = time.clock()
+    print "plotting statistics"
+    print "time: %.3fs" % (ct - st)
+    if ct - st != 0:
+        print "frames per second: %.1f" % (i / (ct - st) )
+    else:
+        print "frames per second: n/a"
+
+
  
 def foo():
     print "bar"

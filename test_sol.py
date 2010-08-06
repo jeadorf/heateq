@@ -58,6 +58,7 @@ def test_speed_2d():
         if i >= 20000:
             break
     ct = time.clock()
+    print "simulator statistics"
     print "time: %.3fs" % (ct - st)
     print "frames: %d" % i
     if ct - st != 0:

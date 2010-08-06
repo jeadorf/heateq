@@ -279,16 +279,19 @@ def main_instationary_2d(opts):
 
         def update(t):
             tplot.t = t
-            tplot.queue_draw()
+            tplot.window.invalidate_rect(tplot.get_allocation(), True)
 
         def run_simulation():
             old_wtm = time.time()
             old_tm = 0
+            i = 0
             for t, tm in sim:
                 if time.time() - old_wtm > 1:
                     gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
-                time.sleep(max(1/100., (tm - old_tm)))
+                if i > 150:
+                    time.sleep(50) #max(1/100, (tm - old_tm)))
+                    i = 0
                 old_tm = tm
                 if opts.maxtime >= 0 and tm > opts.maxtime or stop:
                     break
