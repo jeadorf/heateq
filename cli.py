@@ -285,7 +285,7 @@ def main_instationary_2d(opts):
             old_wtm = time.time()
             old_tm = 0
             for t, tm in sim:
-                if time.time() - old_wtm > .5:
+                if time.time() - old_wtm > 1:
                     gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
                 time.sleep(max(1/100., (tm - old_tm)))

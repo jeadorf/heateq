@@ -55,10 +55,17 @@ def test_speed_2d():
     i = 0
     for t in simulate_2d(ttop, tbottom, tleft, tright, tinit):
         i += 1
-        if i >= 20:
+        if i >= 20000:
             break
     ct = time.clock()
-    print "time=%.3fs,steps=%d,fps=%.2f" % (ct - st, i, i / (ct -st))
+    print "time: %.3fs" % (ct - st)
+    print "frames: %d" % i
+    if ct - st != 0:
+        print "frames per second: %.2f [thousand]" % (i / (ct - st) / 1e3)
+        print "pixel updates per second: %.2f [million]" % (i*m*n / (ct - st) / 1e6)
+    else:
+        print "frames per second: n/a"
+        print "pixel updates per second: n/a"
 
 def test_laplace2d():
     m = 3
