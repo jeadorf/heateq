@@ -64,29 +64,33 @@ def simulate_1d(ts, te, t_init, diffusivity=1, delx=30, delt=0.1):
 def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffusivity=1, delx=30,  delt=0.1):
     m = len(tinit)
     n = len(tinit[0])
-    t = copy.deepcopy(tinit)
     tm = 0
-    delx2 = 1. * delx * delx
+    t = copy.deepcopy(tinit)
     dt = [ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ]
+    delx2 = 1. * delx * delx
     while True:
         yield t, tm
-        # Compute derivative at all interior grid points
-        dt[0][0] = diffusivity * (ttop[0] + t[1][0] - 4*t[0][0] + tleft[0] + t[0][1]) / delx2
+        # compute dt
+        dt[0][0] = diffusivity * (ttop[0] + t[1][0] + tleft[0] + t[0][1] - 4*t[0][0]) / delx2
         for j in xrange(1, n-1):
-            dt[0][j] = diffusivity * (ttop[j] + t[1][j] - 4*t[0][j] + t[0][j-1] + t[0][j+1]) / delx2
-        dt[0][n-1] = diffusivity * (ttop[n-1] + t[1][n-1] - 4*t[0][n-1] + tright[0] + t[0][n-2]) / delx2
+            dt[0][j] = diffusivity * (ttop[j] + t[1][j] + t[0][j-1] + t[0][j+1]- 4*t[0][j]) / delx2
+        dt[0][n-1] = diffusivity * (ttop[n-1] + t[1][n-1] + t[0][n-2] + tright[0]- 4*t[0][0]) / delx2
         for i in xrange(1, m-1):
-            dt[i][0] = diffusivity * (t[i-1][j] + t[i+1][j] - 4*t[i][j] + t[i][j-1] + tright[i]) / delx2
+            dt[i][0] = diffusivity * (t[i-1][0] + t[i+1][0] + tleft[i] + t[i][1] - 4*t[i][0]) / delx2
             for j in xrange(1, n-1):
-                dt[i][j] = diffusivity * (t[i-1][j] + t[i+1][j] - 4*t[i][j] + t[i][j-1] + t[i][j+1]) / delx2
-            dt[i][n-1] = diffusivity * (t[i-1][n-1] + t[i+1][n-1] - 4*t[i][n-1] + t[i][n-2] + tright[i]) / delx2
-        dt[m-1][0] = diffusivity * (tbottom[0] + t[m-2][0] - 4*t[m-1][0] + tleft[m-1] + t[m-1][1]) / delx2
+                nt = t[i-1][j]
+                nb = t[i+1][j]
+                nl = t[i][j-1]
+                nr = t[i][j+1]
+                dt[i][j] = diffusivity * (nt + nb + nl + nr - 4*t[i][j]) / delx2
+            dt[i][n-1] = diffusivity * (t[i-1][n-1] + t[i+1][n-1] + t[i][n-2] + tright[i] - 4*t[i][n-1]) / delx2
+        dt[m-1][0] = diffusivity * (t[m-1][0] + tbottom[0] + tleft[0] + t[m-1][1] - 4*t[m-1][0]) / delx2
         for j in xrange(1, n-1):
-            dt[m-1][j] = diffusivity * (tbottom[j] + t[m-1][j] - 4*t[m-1][j] + t[m-1][j-1] + t[m-1][j+1]) / delx2
-        dt[m-1][n-1] = diffusivity * (tbottom[n-1] + t[m-2][n-1] - 4*t[m-1][n-1] + tright[m-1] + t[m-1][n-2]) / delx2
-        # Euler step
+            dt[m-1][j] = diffusivity * (t[m-1][j] + tbottom[j] + t[m-1][j-1] + t[m-1][j+1]- 4*t[m-1][j]) / delx2
+        dt[m-1][n-1] = diffusivity * (t[m-1][n-1] + tbottom[n-1] + t[m-1][n-2] + tright[m-1]- 4*t[m-1][n-1]) / delx2
+        # Euler
         for i in xrange(0, m):
             for j in xrange(0, n):
-                t[i][j] += delt * dt[i][j]
+                t[i][j] += delt*dt[i][j]
         tm += delt
 

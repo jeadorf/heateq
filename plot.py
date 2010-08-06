@@ -16,9 +16,9 @@ class TemperaturePlot(gtk.DrawingArea):
         self.tmax = tmax
         self.dim = dim
         if self.dim == 2:
-            self.t = [0, 1]
-        else:
             self.t = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+        else:
+            self.t = [0, 1]
     def expose(self, widget, evt):
         ctx = widget.window.cairo_create()
         ctx.rectangle(evt.area.x, evt.area.y, evt.area.width, evt.area.height)
@@ -30,10 +30,7 @@ class TemperaturePlot(gtk.DrawingArea):
             ctx = self.window.cairo_create()
         rect = self.get_allocation()
         if self.dim == 2:
-            try:
-                plot_2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
-            except:
-                print "error"
+            plot_2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
         else:
             plot_1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
 
@@ -64,7 +61,7 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
         ctx.translate(1, 0)
     ctx.restore()
 
-def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
+def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=False):
     ctx.save()
     m = len(t)
     n = len(t[0])
@@ -83,42 +80,43 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
             ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
             ctx.set_source_rgb(c, 0, 1 - c)
             ctx.fill()
-            if i > 0 and j < n - 1:
-                c1 = 1. * (t[i-1][j+1] - tmin) / tspan
-                g1 = cairo.LinearGradient(0, 0, 1, -1)
-                g1.add_color_stop_rgb(0, c, 0, 1 - c)
-                g1.add_color_stop_rgb(1, c1, 0, 1 - c1)
-                ctx.rectangle(0.5, 0, 0.5+pxw, 0.5+pxh)
-                ctx.set_source(g1)
-                ctx.fill()
-            if i > 0 and j > 0:
-                c2 = 1. * (t[i-1][j-1] - tmin) / tspan
-                g2 = cairo.LinearGradient(0, 0, -1, -1)
-                g2.add_color_stop_rgb(0, c, 0, 1 - c)
-                g2.add_color_stop_rgb(1, c2, 0, 1 - c2)
-                ctx.rectangle(0.0, 0.0, 0.5+pxw, 0.5+pxh)
-                ctx.set_source(g2)
-                ctx.fill()
-            if i < m -1 and j > 0:
-                c3 = 1. * (t[i+1][j-1] - tmin) / tspan
-                g3 = cairo.LinearGradient(0, 0, -1, 1)
-                g3.add_color_stop_rgb(0, c, 0, 1 - c)
-                g3.add_color_stop_rgb(1, c3, 0, 1 - c3)
-                ctx.rectangle(0.0, 0.5, 0.5+pxw, 0.5+pxh)
-                ctx.set_source(g3)
-                ctx.fill()
-            if i < m -1 and j < n - 1:
-                c4 = 1. * (t[i+1][j+1] - tmin) / tspan
-                g4 = cairo.LinearGradient(0, 0, 1, 1)
-                g4.add_color_stop_rgb(0, c, 0, 1 - c)
-                g4.add_color_stop_rgb(1, c4, 0, 1 - c4)
-                ctx.rectangle(0.5, 0.5, 0.5+pxw, 0.5+pxh)
-                ctx.set_source(g4)
-                ctx.fill()
-            # todo use compositing
-            # ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
-            # ctx.set_source_rgb(c, 0, 1 - c)
-            # ctx.fill()
+            if interpolate:
+                if i > 0 and j < n - 1:
+                    c1 = 1. * (t[i-1][j+1] - tmin) / tspan
+                    g1 = cairo.LinearGradient(0, 0, 1, -1)
+                    g1.add_color_stop_rgb(0, c, 0, 1 - c)
+                    g1.add_color_stop_rgb(1, c1, 0, 1 - c1)
+                    ctx.rectangle(0.5, 0, 0.5+pxw, 0.5+pxh)
+                    ctx.set_source(g1)
+                    ctx.fill()
+                if i > 0 and j > 0:
+                    c2 = 1. * (t[i-1][j-1] - tmin) / tspan
+                    g2 = cairo.LinearGradient(0, 0, -1, -1)
+                    g2.add_color_stop_rgb(0, c, 0, 1 - c)
+                    g2.add_color_stop_rgb(1, c2, 0, 1 - c2)
+                    ctx.rectangle(0.0, 0.0, 0.5+pxw, 0.5+pxh)
+                    ctx.set_source(g2)
+                    ctx.fill()
+                if i < m -1 and j > 0:
+                    c3 = 1. * (t[i+1][j-1] - tmin) / tspan
+                    g3 = cairo.LinearGradient(0, 0, -1, 1)
+                    g3.add_color_stop_rgb(0, c, 0, 1 - c)
+                    g3.add_color_stop_rgb(1, c3, 0, 1 - c3)
+                    ctx.rectangle(0.0, 0.5, 0.5+pxw, 0.5+pxh)
+                    ctx.set_source(g3)
+                    ctx.fill()
+                if i < m -1 and j < n - 1:
+                    c4 = 1. * (t[i+1][j+1] - tmin) / tspan
+                    g4 = cairo.LinearGradient(0, 0, 1, 1)
+                    g4.add_color_stop_rgb(0, c, 0, 1 - c)
+                    g4.add_color_stop_rgb(1, c4, 0, 1 - c4)
+                    ctx.rectangle(0.5, 0.5, 0.5+pxw, 0.5+pxh)
+                    ctx.set_source(g4)
+                    ctx.fill()
+                # todo use compositing
+                # ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
+                # ctx.set_source_rgb(c, 0, 1 - c)
+                # ctx.fill()
             ctx.translate(1, 0)
         ctx.restore()
         ctx.translate(0, 1)
