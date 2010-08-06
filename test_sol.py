@@ -71,17 +71,18 @@ def test_laplace2d():
         [4, 1, 0, 0],
         [3, 1, 0, 5],
         [0, -2, 1, 0]] , dtype=numpy.double)
-    ttop = numpy.zeros((n,))
-    tbottom = numpy.zeros((n,))
-    tleft = numpy.zeros((m,))
-    tright = numpy.zeros((m,))
+    ttop = numpy.zeros((n,), dtype=numpy.double)
+    tbottom = numpy.zeros((n,), dtype=numpy.double)
+    tleft = numpy.zeros((m,), dtype=numpy.double)
+    tright = numpy.zeros((m,), dtype=numpy.double)
     print "---------  a  ------------"
     print a 
     txx = numpy.zeros((m, n), dtype=numpy.double)
     laplace2d.apply(t, txx, ttop, tbottom, tleft, tright)
     print "--------- txx ------------"
     print txx
-    exp = numpy.dot(a, t.reshape((m*n, 1)))
+    exp = numpy.dot(a, t.reshape((m*n, 1))).reshape((m, n))
     print "--------- exp ------------"
-    print exp.reshape((m, n))
-    assert False 
+    print exp
+    diff = exp - txx
+    assert diff.max()**2 + diff.min()**2 < 1e-16;

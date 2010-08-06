@@ -13,7 +13,7 @@ PyObject *laplace2d_apply(PyObject *self, PyObject *args) {
     // Boundary conditions
     const PyArrayObject *ttoparr, *tbottomarr, *tleftarr, *trightarr;
     // Pointers to raw array data
-    double *t, *txx;
+    double *t, *txx, *ttop, *tbottom, *tleft, *tright;
     // Array dimensions
     npy_intp m, n;
     // Loop variables 
@@ -29,38 +29,44 @@ PyObject *laplace2d_apply(PyObject *self, PyObject *args) {
     /* todo: use macros */
     t = (double*) tarr->data;
     txx = (double*) txxarr->data;
+    ttop = (double*) ttoparr->data;
+    tbottom = (double*) tbottomarr->data;
+    tright = (double*) trightarr->data;
+    tleft = (double*) tleftarr->data;
 
+/*
     printf("m=%d,n=%d,nd=%d,len=%d,elsize=%d\n", m, n, tarr->nd, m*n, tarr->descr->elsize);
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
             printf("%.2f ", t[i * n + j]);
         }
         puts("\n");
-    }
+    }*/
 
-    //txx[0, 0] = diffy * (ttop[0] + t[1, 0] + tleft[0] + t[0, 1] - 4 * t[0, 0]) / delx2
-    //for (j = 1; j < n - 1; j++) {
-    //    txx[0, j] = diffy * (ttop[j] + t[1, j] + t[0, j-1] + t[0, j+1] - 4*t[0, j]) / delx2
-    //}
-    //txx[0, n-1] = diffy * (ttop[n-1] + t[1, n-1] + t[0, n-2] + tright[0] - 4*t[0, n-1]) / delx2
+    txx[0] = ttop[0] + t[n] + tleft[0] + t[1] - 4 * t[0];
+    for (j = 1; j < n - 1; j++) {
+        txx[j] = ttop[j] + t[n+j] + t[j-1] + t[j+1] - 4*t[j];
+    }
+    txx[n-1] = ttop[n-1] + t[n+n-1] + t[n-2] + tright[0] - 4*t[n-1];
     for (i = 1; i < m - 1; i++) {
-        // txx[i, 0] = (t[i-1, 0] + t[i+1, 0] + tleft[i] + t[i, 1] - 4*t[i, 0])
+        txx[i*n] = t[(i-1)*n] + t[(i+1)*n] + tleft[i] + t[i*n+1] - 4*t[i*n];
         for (j = 1; j < n - 1; j++) {
            txx[i*n+j] = t[(i-1)*n+j] + t[(i+1)*n+j] + t[i*n+j-1] + t[i*n+j+1] - 4*t[i*n+j];
         }
-        // txx[i, n-1] = (t[i-1, n-1] + t[i+1, n-1] + t[i, n-2] + tright[i] - 4*t[i, n-1])
+        txx[i*n+n-1] = t[(i-1)*n+n-1] + t[(i+1)*n+n-1] + t[i*n+n-2] + tright[i] - 4*t[i*n+n-1];
     }
-    //txx[m-1, 0] = diffy * (t[m-1, 0] + tbottom[0] + tleft[0] + t[m-1, 1] - 4*t[m-1, 0]) / delx2
-    //for (j = 1; j < n - 1; j++) {
-    //    txx[m-1, j] = diffy * (t[m-1, j] + tbottom[j] + t[m-1, j-1] + t[m-1, j+1]- 4*t[m-1, j]) / delx2
-    //}
-    //txx[m-1, n-1] = diffy * (t[m-1, n-1] + tbottom[n-1] + t[m-1, n-2] + tright[m-1]- 4*t[m-1, n-1]) / delx2
+    txx[(m-1)*n] = t[(m-2)*n] + tbottom[0] + tleft[0] + t[(m-1)*n+1] - 4*t[(m-1)*n];
+    for (j = 1; j < n - 1; j++) {
+        txx[(m-1)*n+j] = t[(m-2)*n+j] + tbottom[j] + t[(m-1)*n+j-1] + t[(m-1)*n+j+1]- 4*t[(m-1)*n+j];
+    }
+    txx[(m-1)*n+n-1] = t[(m-2)*n+n-1] + tbottom[n-1] + t[(m-1)*n+n-2] + tright[m-1]- 4*t[(m-1)*n+n-1];
+/*
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
             printf("%.2f ", txx[i * n + j]);
         }
         puts("\n");
-    }
+    }*/
 
     return PyInt_FromLong((long) 0);
 }

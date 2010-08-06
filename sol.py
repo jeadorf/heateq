@@ -61,6 +61,8 @@ def simulate_1d(ts, te, tinit, diffy=1, delx=30, delt=0.1):
         t = t + delt * dt
         tm += delt
 
+import laplace2d
+
 def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1):
     m = len(tinit)
     n = len(tinit[0])
@@ -83,10 +85,12 @@ def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1
             for j in xrange(1, n-1):
                dt[i, j] = diffy * (t[i-1, j] + t[i+1, j] + t[i, j-1] + t[i, j+1] - 4*t[i, j]) / delx2
             dt[i, n-1] = diffy * (t[i-1, n-1] + t[i+1, n-1] + t[i, n-2] + tright[i] - 4*t[i, n-1]) / delx2
-        dt[m-1, 0] = diffy * (t[m-1, 0] + tbottom[0] + tleft[0] + t[m-1, 1] - 4*t[m-1, 0]) / delx2
+        dt[m-1, 0] = diffy * (t[m-2, 0] + tbottom[0] + tleft[0] + t[m-1, 1] - 4*t[m-1, 0]) / delx2
         for j in xrange(1, n-1):
-            dt[m-1, j] = diffy * (t[m-1, j] + tbottom[j] + t[m-1, j-1] + t[m-1, j+1]- 4*t[m-1, j]) / delx2
-        dt[m-1, n-1] = diffy * (t[m-1, n-1] + tbottom[n-1] + t[m-1, n-2] + tright[m-1]- 4*t[m-1, n-1]) / delx2
+            dt[m-1, j] = diffy * (t[m-2, j] + tbottom[j] + t[m-1, j-1] + t[m-1, j+1]- 4*t[m-1, j]) / delx2
+        dt[m-1, n-1] = diffy * (t[m-2, n-1] + tbottom[n-1] + t[m-1, n-2] + tright[m-1]- 4*t[m-1, n-1]) / delx2
+        # laplace2d.apply(t, dt, ttop, tbottom, tleft, tright)
+        # dt *= diffy / delx2
         # Euler
         t = t + delt * dt
         tm += delt
