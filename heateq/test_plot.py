@@ -2,20 +2,21 @@
 # -*- coding: utf-8 -*-
 
 import time
-import sol
+import solver
+from solver import InitConds2d, const
 import numpy
 import cairo
 from plot import *
 
 def test_plot2d_speed():
     m, n = 30, 30
-    initconds = sol.InitConds2d(m, n, bottom=sol.const(numpy.ones((n,))))
+    initconds = InitConds2d(m, n, bottom=const(numpy.ones((n,))))
     max = 100
     imsf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
     ctx = cairo.Context(imsf)
     i = 0
     st = time.clock()
-    for t, tm in sol.simulate2d(initconds):
+    for t, tm in solver.simulate2d(initconds):
         i += 1
         plot_2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:

@@ -3,7 +3,7 @@
 
 import cairo
 import gtk
-import sol
+import solver
 import sys
 import numpy
 import heateqplot

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sol
-from sol import InitConds2d, InitConds1d, const
+import solver
+from solver import InitConds2d, InitConds1d, const
 import plot
 import optparse
 import copy
@@ -205,7 +205,7 @@ def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
             opts.tinit = numpy.zeros((opts.n, ))
         initconds = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
-        sim  = sol.simulate1d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
+        sim  = solver.simulate1d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
         tmin = min(opts.tinit)
@@ -251,7 +251,7 @@ def main_stationary_2d(opts):
     if len(opts.tright) < m:
         opts.tright = numpy.zeros((m,))
     initconds = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
-    t = sol.solve2d(initconds)
+    t = solver.solve2d(initconds)
     if opts.pdf == None:
         plot.show_win_2d_stationary(t)
     else:
@@ -274,7 +274,7 @@ def main_instationary_2d(opts):
 
         initconds = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft), opts.tinit)
 
-        sim = sol.simulate2d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
+        sim = solver.simulate2d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
 
         tplot = plot.TemperaturePlot(tmin, tmax, dim=2)
         win.add(tplot)
