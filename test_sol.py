@@ -6,7 +6,7 @@ from sol import *
 eps = 1.e-8
 
 def test_solve_stationary_1d():
-    ts, te, n = 5, -5, 3 
+    ts, te, n = 5, -5, 3
     t = solve_stationary_1d(ts, te, n)
     assert t[0] == ts
     assert abs(t[2]) < eps
@@ -41,4 +41,4 @@ def test_generate_b_2d():
     b = numpy.matrix([generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, 2, 3) for i in xrange(0, 6)])
     exp = numpy.matrix([-5, -2, -8, -13, -9, -21])
     assert (b == exp).all()
-    
+

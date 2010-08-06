@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sol 
+import sol
 import plot
 import optparse
 import copy
@@ -150,10 +150,10 @@ def add_pdf_opt(optparser):
 
 def check_float_list(option, opt, value):
     try:
-        lst = [] 
+        lst = []
         for v in value.split(","):
             lst.append(float(v))
-        return lst 
+        return lst
     except ValueError:
         raise optparse.OptionValueError(
             "option %s: invalid float list value: %r" % (opt, value))
@@ -220,7 +220,7 @@ def main_instationary_1d(opts):
             tplot.t = t
             tplot.queue_draw()
 
-        def run_simulation(): 
+        def run_simulation():
             old_wtm = time.time()
             old_tm = 0
             for t, tm in sim:
@@ -238,7 +238,7 @@ def main_instationary_1d(opts):
         stop = True
 
 def main_stationary_2d(opts):
-    m = opts.m 
+    m = opts.m
     n = opts.n
     if len(opts.ttop) < n:
         opts.ttop = [0 for j in xrange(0, n)]
@@ -255,7 +255,7 @@ def main_stationary_2d(opts):
         plot.gen_pdf_2d(t, opts.pdf)
 import math
 def main_instationary_2d(opts):
-        m = opts.m 
+        m = opts.m
         n = opts.n
         opts.tinit = [ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ]
         opts.ttop = [ math.sin(0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ]
@@ -277,10 +277,10 @@ def main_instationary_2d(opts):
         tmax = max(tmax, max(opts.tbottom))
         tmax = max(tmax, max(opts.tleft))
         tmax = max(tmax, max(opts.tright))
-        
+
         sim = sol.simulate_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, opts.tinit,
                               opts.diffusivity, opts.locstep, opts.timestep)
-            
+
         tplot = plot.TemperaturePlot(tmin, tmax, dim=2)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
@@ -291,7 +291,7 @@ def main_instationary_2d(opts):
             tplot.t = t
             tplot.queue_draw()
 
-        def run_simulation(): 
+        def run_simulation():
             old_wtm = time.time()
             old_tm = 0
             for t, tm in sim:
@@ -311,4 +311,4 @@ def main_instationary_2d(opts):
 
 if __name__ == "__main__":
     main()
-    
+
