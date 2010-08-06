@@ -9,17 +9,13 @@ from plot import *
 
 def test_plot2d_speed():
     m, n = 30, 30
-    ttop = numpy.zeros((n,))
-    tbottom = numpy.ones((n,))
-    tleft = numpy.zeros((m,))
-    tright = numpy.zeros((m,))
-    tinit = numpy.zeros((m,n))
+    initconds = sol.InitConds2d(m, n, bottom=sol.const(numpy.ones((n,))))
     max = 100
     imsf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
     ctx = cairo.Context(imsf)
     i = 0
     st = time.clock()
-    for t, tm in sol.simulate_2d((lambda tm: ttop), (lambda tm: tbottom), (lambda tm: tleft), (lambda tm: tright), tinit):
+    for t, tm in sol.simulate_2d(initconds):
         i += 1
         plot_2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:

@@ -4,10 +4,38 @@
 import numpy
 import heateqlapl
 
-class InitConds:
+
+class InitConds2d:
     
-    def __init__(self, tl):
-        pass
+    def __init__(self, m, n, top=None, right=None, bottom=None, left=None, interior=None):
+        self.m = m
+        self.n = n
+        if top == None:
+            self.top = const(numpy.zeros((n,)))
+        else:
+            self.top = top
+        if bottom == None:
+            self.bottom = const(numpy.zeros((n,)))
+        else:
+            self.bottom = bottom 
+        if right == None:
+            self.right = const(numpy.zeros((n,)))
+        else:
+            self.right = right
+        if left == None:
+            self.left = const(numpy.zeros((n,)))
+        else:
+            self.left = left
+        if interior == None:
+            self.interior = numpy.zeros((m, n))
+        else:
+            self.interior = interior
+    
+    def shape(self):
+        return self.m, self.n
+
+def const(val):
+    return (lambda tm: val)
 
 def solve_stationary_1d(ts, te, n):
     """Solves the stationary heat equation in one dimension.  The Dirichlet
@@ -67,20 +95,16 @@ def simulate_1d(ts, te, tinit, diffy=1, delx=30, delt=0.1):
         t = t + delt * dt
         tm += delt
 
-def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffy=1, delx=30,  delt=0.1):
-    m = len(tinit)
-    n = len(tinit[0])
+def simulate_2d(initconds, diffy=1, delx=30,  delt=0.1):
+    m, n = initconds.shape()
     tm = 0
-    t = numpy.zeros((m, n))
-    for i in xrange(0, m):
-        for j in xrange(0, n):
-            t[i, j] = tinit[i][j]
+    t = initconds.interior.copy()
     dt = numpy.empty((m,n))
     delx2 = 1. * delx * delx
     while True:
         yield t, tm
         # Calculate second derivative
-        heateqlapl.apply(t, dt, ttop(tm), tbottom(tm), tleft(tm), tright(tm))
+        heateqlapl.apply(t, dt, initconds.top(tm), initconds.bottom(tm), initconds.left(tm), initconds.right(tm))
         # Euler
         t = t + (1. * delt * diffy / delx2) * dt
         tm += delt

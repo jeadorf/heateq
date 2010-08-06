@@ -7,6 +7,19 @@ import heateqlapl
 
 eps = 1.e-8
 
+def test_init_conds_2d():
+    a = numpy.array([1, 2, 3])
+    b = numpy.array([1, 2])
+    top = lambda tm: 2 * a
+    right = lambda tm: 3 * a
+    bottom = lambda tm: 4 * b
+    left = lambda tm: 5 * b
+    ic = InitConds2d(2, 3, top, right, bottom, left)
+    assert (ic.top(1) == 2 * a).all()
+    assert (ic.right(1) == 3 * a).all()
+    assert (ic.bottom(1) == 4 * b).all()
+    assert (ic.left(1) == 5 * b).all()
+
 def test_solve_stationary_1d():
     ts, te, n = 5, -5, 3
     t = solve_stationary_1d(ts, te, n)
@@ -47,13 +60,10 @@ def test_generate_b_2d():
 def test_speed_2d():
     st = time.clock()
     m, n = 50, 50
-    ttop = numpy.zeros((n,))
-    tbottom = numpy.ones((n,))
-    tleft = numpy.zeros((m,))
-    tright = numpy.zeros((m,))
-    tinit = numpy.zeros((m,n))
+    bottom = const(numpy.ones((n,)))
+    initconds = InitConds2d(m, n, bottom=bottom)
     i = 0
-    for t in simulate_2d((lambda tm: ttop), (lambda tm: tbottom), (lambda tm: tleft), (lambda tm: tright), tinit):
+    for t in simulate_2d(initconds):
         i += 1
         if i >= 20000:
             break
