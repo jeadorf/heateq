@@ -47,20 +47,18 @@ def generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, m, n):
 def simulate_1d(ts, te, t_init, diffusivity=1, delx=30, delt=0.1):
     n = len(t_init)
     assert n > 1
-    t = copy.copy(t_init)
+    t = numpy.array(t_init)
     tm = 0
     delx2 = 1. * delx * delx 
-    dt = [ 0 for i in xrange(0, n) ]
+    dt = numpy.empty((n,))
     while True:
-        yield ([ts(tm)] + t + [te(tm)], tm)
+        yield t, tm
         # Compute derivative at all interior grid points
         dt[0] = diffusivity * (ts(tm) - 2*t[0] + t[1]) / delx2
         for i in xrange(1, n-1):
             dt[i] = diffusivity * (t[i-1] - 2*t[i] + t[i+1]) / delx2 
         dt[n-1] = diffusivity * (t[n-2] - 2*t[n-1] + te(tm)) / delx2
-        # Euler step
-        for i in xrange(0, n):
-            t[i] += delt * dt[i]
+        t = t + delt * dt
         tm += delt
 
 def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffusivity=1, delx=30,  delt=0.1):

@@ -15,14 +15,12 @@ def test_solve_stationary_1d():
 def test_if_simulate_1d_converges():
     ts, te = 5, -5
     t = None
-    maxtm = 5000
+    maxtm = 500
     for tt, tm in simulate_1d((lambda tm: ts), (lambda tm: te), [0, 0.2, 0.3], 300):
         t = tt
         if tm > maxtm:
             break
-    assert t[0] == ts
-    assert abs(t[2]) < eps
-    assert t[4] == te
+    assert abs(t[1]) < eps
 
 def test_generate_matrix_2d():
     a = numpy.matrix(
