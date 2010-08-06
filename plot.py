@@ -61,7 +61,7 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
         ctx.translate(1, 0)
     ctx.restore()
 
-def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=False):
+def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
     m = len(t)
     n = len(t[0])
@@ -77,7 +77,7 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=False):
         ctx.save()
         for j in xrange(0, n):
             c = 1. * (t[i][j] - tmin) / tspan
-            ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
+            ctx.rectangle(0, 0, 1 + 2*pxw, 1 + 2*pxh)
             ctx.set_source_rgb(c, 0, 1 - c)
             ctx.fill()
             if interpolate:
@@ -113,10 +113,6 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=False):
                     ctx.rectangle(0.5, 0.5, 0.5+pxw, 0.5+pxh)
                     ctx.set_source(g4)
                     ctx.fill()
-                # todo use compositing
-                # ctx.rectangle(0, 0, 1 + pxw, 1 + pxh)
-                # ctx.set_source_rgb(c, 0, 1 - c)
-                # ctx.fill()
             ctx.translate(1, 0)
         ctx.restore()
         ctx.translate(0, 1)

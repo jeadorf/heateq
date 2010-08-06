@@ -65,7 +65,7 @@ def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffusivity=1, delx=30,  de
     m = len(tinit)
     n = len(tinit[0])
     tm = 0
-    t = copy.deepcopy(tinit)
+    t = copy.deepcopy(tinit) 
     dt = [ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ]
     delx2 = 1. * delx * delx
     while True:
@@ -74,7 +74,7 @@ def simulate_2d(ttop, tbottom, tleft, tright, tinit, diffusivity=1, delx=30,  de
         dt[0][0] = diffusivity * (ttop[0] + t[1][0] + tleft[0] + t[0][1] - 4*t[0][0]) / delx2
         for j in xrange(1, n-1):
             dt[0][j] = diffusivity * (ttop[j] + t[1][j] + t[0][j-1] + t[0][j+1]- 4*t[0][j]) / delx2
-        dt[0][n-1] = diffusivity * (ttop[n-1] + t[1][n-1] + t[0][n-2] + tright[0]- 4*t[0][0]) / delx2
+        dt[0][n-1] = diffusivity * (ttop[n-1] + t[1][n-1] + t[0][n-2] + tright[0]- 4*t[0][n-1]) / delx2
         for i in xrange(1, m-1):
             dt[i][0] = diffusivity * (t[i-1][0] + t[i+1][0] + tleft[i] + t[i][1] - 4*t[i][0]) / delx2
             for j in xrange(1, n-1):
