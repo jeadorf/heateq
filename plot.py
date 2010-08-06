@@ -64,7 +64,10 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
         ctx.translate(1, 0)
     ctx.restore()
 
+import plot2d
+
 def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
+    #plot2d.plot2d(t, ctx, x, y, w, h, tmin, tmax) 
     ctx.save()
     m = len(t)
     n = len(t[0])

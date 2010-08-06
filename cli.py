@@ -298,7 +298,6 @@ def main_instationary_2d(opts):
         gtk.main()
         stop = True
 
-
 if __name__ == "__main__":
     main()
 
