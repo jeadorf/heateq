@@ -10,15 +10,17 @@ def solve_stationary_1d(ts, te, n):
     temperature values at grid points 0 and n+1.  The number of interior grid
     points is n > 1. Returns an array with n+2 elements, including the values
     at the boundaries."""
-    return [ 1. * ts + 1. * i * (te - ts) / (n + 1) for i in xrange(0, n+2)]
+    return numpy.array([ 1. * ts + 1. * i * (te - ts) / (n + 1) for i in xrange(0, n+2)])
 
 def solve_stationary_2d(tb_top, tb_bottom, tb_left, tb_right, m, n):
-    # Matrix generator
-    a = numpy.matrix([ [ generate_matrix_2d(i, j, m, n) for j in xrange(0, m*n) ] for i in xrange(0, m*n) ])
-    b = numpy.matrix([ [ generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, m, n) ] for i in xrange(0, m*n)])
+    a = numpy.empty((m*n, n*n))
+    b = numpy.empty((m*n,))
+    for i in xrange(0, m*n):
+        for j in xrange(0, m*n):
+            a[i, j] = generate_matrix_2d(i, j, m, n)
+        b[i] = generate_b_2d(i, tb_top, tb_bottom, tb_left, tb_right, m, n)
     x = numpy.linalg.solve(a, b)
-    t = [ [ x.item(i * n + j) for j in xrange(0, n) ] for i in xrange(0, m) ]
-    return t
+    return x.reshape(m, n)
 
 def generate_matrix_2d(i, j, m, n):
     if i == j:

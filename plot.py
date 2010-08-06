@@ -7,6 +7,7 @@ import sol
 import math
 import copy
 import sys
+import numpy
 
 class TemperaturePlot(gtk.DrawingArea):
     def __init__(self, tmin, tmax, dim=1):
@@ -63,6 +64,8 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
 
 def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
+    # todo: workaround
+    t = numpy.array(t)
     m = len(t)
     n = len(t[0])
     ctx.translate(x, y)
@@ -76,13 +79,13 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     for i in xrange(0, m):
         ctx.save()
         for j in xrange(0, n):
-            c = 1. * (t[i][j] - tmin) / tspan
+            c = 1. * (t[i, j] - tmin) / tspan
             ctx.rectangle(0, 0, 1 + 2*pxw, 1 + 2*pxh)
             ctx.set_source_rgb(c, 0, 1 - c)
             ctx.fill()
             if interpolate:
                 if i > 0 and j < n - 1:
-                    c1 = 1. * (t[i-1][j+1] - tmin) / tspan
+                    c1 = 1. * (t[i-1, j+1] - tmin) / tspan
                     g1 = cairo.LinearGradient(0, 0, 1, -1)
                     g1.add_color_stop_rgb(0, c, 0, 1 - c)
                     g1.add_color_stop_rgb(1, c1, 0, 1 - c1)
@@ -90,7 +93,7 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
                     ctx.set_source(g1)
                     ctx.fill()
                 if i > 0 and j > 0:
-                    c2 = 1. * (t[i-1][j-1] - tmin) / tspan
+                    c2 = 1. * (t[i-1, j-1] - tmin) / tspan
                     g2 = cairo.LinearGradient(0, 0, -1, -1)
                     g2.add_color_stop_rgb(0, c, 0, 1 - c)
                     g2.add_color_stop_rgb(1, c2, 0, 1 - c2)
@@ -98,7 +101,7 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
                     ctx.set_source(g2)
                     ctx.fill()
                 if i < m -1 and j > 0:
-                    c3 = 1. * (t[i+1][j-1] - tmin) / tspan
+                    c3 = 1. * (t[i+1, j-1] - tmin) / tspan
                     g3 = cairo.LinearGradient(0, 0, -1, 1)
                     g3.add_color_stop_rgb(0, c, 0, 1 - c)
                     g3.add_color_stop_rgb(1, c3, 0, 1 - c3)
@@ -106,7 +109,7 @@ def plot_2d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
                     ctx.set_source(g3)
                     ctx.fill()
                 if i < m -1 and j < n - 1:
-                    c4 = 1. * (t[i+1][j+1] - tmin) / tspan
+                    c4 = 1. * (t[i+1, j+1] - tmin) / tspan
                     g4 = cairo.LinearGradient(0, 0, 1, 1)
                     g4.add_color_stop_rgb(0, c, 0, 1 - c)
                     g4.add_color_stop_rgb(1, c4, 0, 1 - c4)
@@ -135,7 +138,7 @@ def show_win_1d_stationary(t):
     win = gtk.Window()
     win.set_title("Temperature curve, n=%d" % (len(t)-2))
     win.set_default_size(800, 100)
-    plot = TemperaturePlot(min(t), max(t))
+    plot = TemperaturePlot(t.min(), t.max())
     plot.t = t
     win.add(plot)
     win.connect("destroy", gtk.main_quit)
@@ -149,10 +152,8 @@ def show_win_2d_stationary(t):
     win.set_default_size(800, 800)
     tmin = sys.maxint
     tmax = -sys.maxint
-    for i in xrange(0, m):
-        for j in xrange(0, n):
-            tmin = min(tmin, t[i][j])
-            tmax = max(tmax, t[i][j])
+    tmin = min(tmin, t.min())
+    tmax = max(tmax, t.max())
     plot = TemperaturePlot(tmin, tmax, dim=2)
     plot.t = t
     win.add(plot)
