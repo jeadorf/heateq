@@ -6,7 +6,7 @@ import gtk
 import sol
 import sys
 import numpy
-import plot2d
+import heateq_plot2d
 
 class TemperaturePlot(gtk.DrawingArea):
 

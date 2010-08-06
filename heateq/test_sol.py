@@ -3,7 +3,7 @@
 
 from sol import *
 import time
-import laplace2d
+import heateq_laplace2d
 
 eps = 1.e-8
 
@@ -86,7 +86,7 @@ def test_laplace2d():
     print "---------  a  ------------"
     print a 
     txx = numpy.zeros((m, n), dtype=numpy.double)
-    laplace2d.apply(t, txx, ttop, tbottom, tleft, tright)
+    heateq_laplace2d.apply(t, txx, ttop, tbottom, tleft, tright)
     print "--------- txx ------------"
     print txx
     exp = numpy.dot(a, t.reshape((m*n, 1))).reshape((m, n))

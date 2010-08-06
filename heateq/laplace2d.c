@@ -1,7 +1,7 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
-PyObject *laplace2d_apply(PyObject *self, PyObject *args) {
+PyObject *heateq_laplace2d_apply(PyObject *self, PyObject *args) {
     const PyObject *tarr;
     const PyObject *txxarr;
     const PyObject *ttoparr, *tbottomarr, *tleftarr, *trightarr;
@@ -47,11 +47,11 @@ PyObject *laplace2d_apply(PyObject *self, PyObject *args) {
 
 
 static PyMethodDef Laplace2dMethods[] = {
-    {"apply",  laplace2d_apply, METH_VARARGS, "Apply the 2d Laplace operator."},
+    {"apply",  heateq_laplace2d_apply, METH_VARARGS, "Apply the 2d Laplace operator."},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
-PyMODINIT_FUNC initlaplace2d(void) {
-    (void) Py_InitModule("laplace2d", Laplace2dMethods);
+PyMODINIT_FUNC initheateq_laplace2d(void) {
+    (void) Py_InitModule("heateq_laplace2d", Laplace2dMethods);
 }
 

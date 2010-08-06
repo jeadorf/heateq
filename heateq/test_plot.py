@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import plot
-import plot2d
 import time
 import sol
 import numpy

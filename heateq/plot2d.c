@@ -6,7 +6,7 @@
 
 static Pycairo_CAPI_t *Pycairo_CAPI;
 
-PyObject *plot2d_plot2d(PyObject *self, PyObject *args) {
+PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
     const PyObject *tarr;
     double *t;
     const PyObject *crobj;
@@ -58,13 +58,13 @@ PyObject *plot2d_plot2d(PyObject *self, PyObject *args) {
 }
 
 
-static PyMethodDef Plot2dMethods[] = {
-    {"plot2d",  plot2d_plot2d, METH_VARARGS, "Plot a 2d temperature grid."},
+static PyMethodDef HeateqPlotMethods[] = {
+    {"plot2d",  heateqplot_plot2d, METH_VARARGS, "Plot a 2d temperature grid."},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
-PyMODINIT_FUNC initplot2d(void) {
+PyMODINIT_FUNC initheateqplot(void) {
     Pycairo_IMPORT;
-    (void) Py_InitModule("plot2d", Plot2dMethods);
+    (void) Py_InitModule("heateqplot", HeateqPlotMethods);
 }
 
