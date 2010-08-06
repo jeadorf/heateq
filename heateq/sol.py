@@ -55,15 +55,10 @@ class InitConds1d:
 def const(val):
     return (lambda tm: val)
 
-def solve_stationary_1d(initconds):
-    """Solves the stationary heat equation in one dimension.  The Dirichlet
-    boundary conditions are given by values ts and te, describing the constant
-    temperature values at grid points 0 and n+1.  The number of interior grid
-    points is n > 1. Returns an array with n+2 elements, including the values
-    at the boundaries."""
+def solve1d(initconds):
     return numpy.linspace(initconds.left(0), initconds.right(0), initconds.n)
 
-def solve_stationary_2d(initconds):
+def solve2d(initconds):
     m, n = initconds.m, initconds.n
     ttop = initconds.top(0)
     tright = initconds.right(0)
@@ -103,7 +98,7 @@ def laplacian_b(ttop, tbottom, tleft, tright, m, n):
         b[i] = v
     return b
 
-def simulate_1d(initconds, diffy=1, delx=30, delt=0.1):
+def simulate1d(initconds, diffy=1, delx=30, delt=0.1):
     n = initconds.n
     assert n > 1
     t = initconds.interior.copy()
@@ -123,7 +118,7 @@ def simulate_1d(initconds, diffy=1, delx=30, delt=0.1):
         t = t + delt * dt
         tm += delt
 
-def simulate_2d(initconds, diffy=1, delx=30,  delt=0.1):
+def simulate2d(initconds, diffy=1, delx=30,  delt=0.1):
     m, n = initconds.shape()
     tm = 0
     t = initconds.interior.copy()

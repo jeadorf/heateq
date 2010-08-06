@@ -13,7 +13,7 @@ def kochtopf():
     m = 20 
     n = 40
     ic = InitConds2d(m, n, bottom = const(numpy.ones((n,))))
-    t = sol.solve_stationary_2d(ic)
+    t = sol.solve2d(ic)
     plot.gen_pdf_2d(t, "kochtopf.pdf")
 
 def randomheat():
@@ -25,7 +25,7 @@ def randomheat():
     bottom = const(numpy.array([random.uniform(0, 1) for j in xrange(0, n) ]))
     left = const(numpy.array([random.uniform(0, 1)  for i in xrange(0, m) ]))
     ic = InitConds2d(m, n, top, right, bottom, left)
-    t = sol.solve_stationary_2d(ic)
+    t = sol.solve2d(ic)
     plot.gen_pdf_2d(t, "randomheat.pdf")
 
 def sinfun():
@@ -37,7 +37,7 @@ def sinfun():
     left = const(numpy.array([math.sin(math.pi * (i + n/3) / n) for i in xrange(0, m) ]))
     right = const(numpy.array([math.sin(math.pi * (i - n/3) / n) for i in xrange(0, m) ]))
     ic = InitConds2d(m, n, top, right, bottom, left)
-    t = sol.solve_stationary_2d(ic)
+    t = sol.solve2d(ic)
     plot.gen_pdf_2d(t, "sinfun.pdf")
 
 def fireinthecorner():
@@ -61,7 +61,7 @@ def fireinthecorner():
            [0 for i in xrange(0, m) ] +
            [1 for i in xrange(0, m) ]))
     ic = InitConds2d(3*m, 3*n, top, right, bottom, left)
-    t = sol.solve_stationary_2d(ic)
+    t = sol.solve2d(ic)
     plot.gen_pdf_2d(t, "fireinthecorner.pdf")
 
 
