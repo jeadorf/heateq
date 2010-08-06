@@ -6,7 +6,6 @@
 
 static Pycairo_CAPI_t *Pycairo_CAPI;
 
-// UNUSED
 PyObject *plot2d_plot2d(PyObject *self, PyObject *args) {
     const PyObject *tarr;
     double *t;

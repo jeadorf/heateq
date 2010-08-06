@@ -53,7 +53,7 @@ def test_speed_2d():
     tright = numpy.zeros((m,))
     tinit = numpy.zeros((m,n))
     i = 0
-    for t in simulate_2d(ttop, tbottom, tleft, tright, tinit):
+    for t in simulate_2d((lambda tm: ttop), (lambda tm: tbottom), (lambda tm: tleft), (lambda tm: tright), tinit):
         i += 1
         if i >= 20000:
             break

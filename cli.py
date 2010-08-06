@@ -268,7 +268,7 @@ def main_instationary_2d(opts):
         tmin = min(opts.tinit.min(), opts.ttop.min(), opts.tbottom.min(), opts.tleft.min(), opts.tright.min())
         tmax = max(opts.tinit.max(), opts.ttop.max(), opts.tbottom.max(), opts.tleft.max(), opts.tright.max())
 
-        sim = sol.simulate_2d(opts.ttop, opts.tbottom, opts.tleft, opts.tright, opts.tinit,
+        sim = sol.simulate_2d((lambda tm: opts.ttop), (lambda tm: opts.tbottom), (lambda tm: opts.tleft), (lambda tm: opts.tright), opts.tinit,
                               opts.diffusivity, opts.locstep, opts.timestep)
 
         tplot = plot.TemperaturePlot(tmin, tmax, dim=2)

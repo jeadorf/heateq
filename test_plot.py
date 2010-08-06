@@ -21,7 +21,7 @@ def test_plot2d_speed():
     ctx = cairo.Context(imsf)
     i = 0
     st = time.clock()
-    for t, tm in sol.simulate_2d(ttop, tbottom, tleft, tright, tinit):
+    for t, tm in sol.simulate_2d((lambda tm: ttop), (lambda tm: tbottom), (lambda tm: tleft), (lambda tm: tright), tinit):
         i += 1
         plot_2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:
