@@ -3,6 +3,11 @@
 
 import numpy
 
+class InitConds:
+    
+    def __init__(self, tl):
+        pass
+
 def solve_stationary_1d(ts, te, n):
     """Solves the stationary heat equation in one dimension.  The Dirichlet
     boundary conditions are given by values ts and te, describing the constant

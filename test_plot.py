@@ -30,10 +30,12 @@ def test_plot2d_speed():
     stp = time.clock()
     for t, tm in sol.simulate_2d(ttop, tbottom, tleft, tright, tinit):
         i += 1
-        plot2d.plot2d(t, ctx, 0, 0, 400, 400, 0, 1)
+        plot2d.plot2d(t, ctx, 0, 0, 400, 400, 0, 1, False)
         if i >= max:
             break
     ctp = time.clock()
     print "Python time=%.3fs" % (ctc - stc)
     print "C Ext. time=%.3fs" % (ctp - stp)
  
+def foo():
+    print "bar"

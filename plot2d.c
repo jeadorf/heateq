@@ -1,27 +1,23 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <pycairo/pycairo.h>
+#include <cairo/cairo.h>
 #include <stdio.h>
 
 static Pycairo_CAPI_t *Pycairo_CAPI;
 
 // UNUSED
 PyObject *plot2d_plot2d(PyObject *self, PyObject *args) {
-    // Contains the vector of temperatur values
     const PyObject *tarr;
-    // Raw temperature data 
     double *t;
-    // Contains the drawing context
     const PyObject *crobj;
     double x, y, w, h, tmin, tmax;
     int interpolate = 1;
     cairo_t *cr; 
-    // Array dimensions
     npy_intp m, n;
-    // Loop variables 
     int i, j;
 
-    if (!PyArg_ParseTuple(args, "OOdddddd|i", &tarr, &crobj, &x, &y, &w, &h, &tmin, &tmax, &interpolate)) {
+    if (!PyArg_ParseTuple(args, "OOdddddd|iO", &tarr, &crobj, &x, &y, &w, &h, &tmin, &tmax, &interpolate)) {
         return NULL;
     }
 

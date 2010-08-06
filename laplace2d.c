@@ -2,18 +2,11 @@
 #include <numpy/arrayobject.h>
 
 PyObject *laplace2d_apply(PyObject *self, PyObject *args) {
-    // Contains the vector of temperatur values
     const PyObject *tarr;
-    // Collecting parameter that will contain approximations for the sum of the second-order 
-    // derivatives.
     const PyObject *txxarr;
-    // Boundary conditions
     const PyObject *ttoparr, *tbottomarr, *tleftarr, *trightarr;
-    // Pointers to raw array data
     double *t, *txx, *ttop, *tbottom, *tleft, *tright;
-    // Array dimensions
     npy_intp m, n;
-    // Loop variables 
     int i, j;
 
     if (!PyArg_ParseTuple(args, "OOOOOO", &tarr, &txxarr, &ttoparr, &tbottomarr, &tleftarr, &trightarr)) {
