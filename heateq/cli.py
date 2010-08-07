@@ -12,7 +12,7 @@ import gtk
 import time
 import sys
 import math
-import numpy
+import numpy as np
 
 def add_stationary_opt(optparser):
     optparser.add_option(
@@ -138,7 +138,7 @@ def add_tinit_opt(optparser):
         action="store",
         dest="tinit",
         type="ndarray",
-        default=numpy.zeros((1,)),
+        default=np.zeros((1,)),
         help="Initial temperature at interior grid points."
     )
 
@@ -153,7 +153,7 @@ def add_pdf_opt(optparser):
 
 def check_ndarray(option, opt, value):
     try:
-        return numpy.fromstring(value, sep=",")
+        return np.fromstring(value, sep=",")
     except ValueError:
         raise optparse.OptionValueError(
             "option %s: invalid ndarray value: %r" % (opt, value))
@@ -203,7 +203,7 @@ def main_stationary_1d(opts):
 
 def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
-            opts.tinit = numpy.zeros((opts.n, ))
+            opts.tinit = np.zeros((opts.n, ))
         ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
         sim  = solver.simulate1d(ic, opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
@@ -243,13 +243,13 @@ def main_stationary_2d(opts):
     m = opts.m
     n = opts.n
     if len(opts.ttop) < n:
-        opts.ttop = numpy.zeros((n,))
+        opts.ttop = np.zeros((n,))
     if len(opts.tbottom) < n:
-        opts.tbottom = numpy.ones((n,))
+        opts.tbottom = np.ones((n,))
     if len(opts.tleft) < m:
-        opts.tleft = numpy.zeros((m,))
+        opts.tleft = np.zeros((m,))
     if len(opts.tright) < m:
-        opts.tright = numpy.zeros((m,))
+        opts.tright = np.zeros((m,))
     ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
     t = solver.solve2d(ic)
     if opts.pdf == None:
@@ -260,11 +260,11 @@ def main_stationary_2d(opts):
 def main_instationary_2d(opts):
         m = opts.m
         n = opts.n
-        opts.tinit = numpy.array([ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ])
-        opts.ttop = numpy.array([ math.sin(0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
-        opts.tbottom = numpy.array([ math.sin(- 0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
-        opts.tleft = numpy.array([ math.sin(- 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
-        opts.tright = numpy.array([ math.sin( 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
+        opts.tinit = np.array([ [ 0 for j in xrange(0, n) ] for i in xrange(0, m) ])
+        opts.ttop = np.array([ math.sin(0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
+        opts.tright = np.array([ math.sin( 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
+        opts.tbottom = np.array([ math.sin(- 0.5 * math.pi + 1.0 * j / n * math.pi) for j in xrange(0, n) ])
+        opts.tleft = np.array([ math.sin(- 0.25 * math.pi + 1.0 * i / n * math.pi) for i in xrange(0, m) ])
         win = gtk.Window()
         win.set_default_size(400, 400)
         

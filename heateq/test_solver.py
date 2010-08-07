@@ -9,8 +9,8 @@ import heateqlapl
 eps = 1.e-8
 
 def test_init_conds_2d():
-    a = numpy.array([1, 2, 3])
-    b = numpy.array([1, 2])
+    a = np.array([1, 2, 3])
+    b = np.array([1, 2])
     top = lambda tm: 2 * a
     right = lambda tm: 3 * a
     bottom = lambda tm: 4 * b
@@ -32,7 +32,7 @@ def test_if_simulate1d_converges():
     ts, te = 5, -5
     t = None
     maxtm = 500
-    ic = InitConds1d(3, const(5), const(-5), numpy.array([0, 0.2, 0.3]))
+    ic = InitConds1d(3, const(5), const(-5), np.array([0, 0.2, 0.3]))
     for tt, tm in simulate1d(ic, 300):
         t = tt
         if tm > maxtm:
@@ -40,7 +40,7 @@ def test_if_simulate1d_converges():
     assert abs(t[1]) < eps
 
 def test_laplacian():
-    a = numpy.array(
+    a = np.array(
         [[-4,  1,  0,  1,  0,  0],
          [ 1, -4,  1,  0,  1,  0],
          [ 0,  1, -4,  0,  0,  1],
@@ -56,13 +56,13 @@ def test_laplacian_b():
     tb_left = [4, 6]
     tb_right = [5, 11]
     b = laplacian_b(tb_top, tb_bottom, tb_left, tb_right, 2, 3)
-    exp = numpy.array([-5, -2, -8, -13, -9, -21])
+    exp = np.array([-5, -2, -8, -13, -9, -21])
     assert (b == exp).all()
 
 def test_speed_2d():
     st = time.clock()
     m, n = 50, 50
-    bottom = const(numpy.ones((n,)))
+    bottom = const(np.ones((n,)))
     ic = InitConds2d(m, n, bottom=bottom)
     i = 0
     for t in simulate2d(ic):
@@ -84,21 +84,21 @@ def test_laplace2d():
     m = 3
     n = 4 
     a = laplacian(m, n)
-    t = numpy.array([
+    t = np.array([
         [4, 1, 0, 0],
         [3, 1, 0, 5],
-        [0, -2, 1, 0]] , dtype=numpy.double)
-    ttop = numpy.zeros((n,), dtype=numpy.double)
-    tbottom = numpy.zeros((n,), dtype=numpy.double)
-    tleft = numpy.zeros((m,), dtype=numpy.double)
-    tright = numpy.zeros((m,), dtype=numpy.double)
+        [0, -2, 1, 0]] , dtype=np.double)
+    ttop = np.zeros((n,), dtype=np.double)
+    tbottom = np.zeros((n,), dtype=np.double)
+    tleft = np.zeros((m,), dtype=np.double)
+    tright = np.zeros((m,), dtype=np.double)
     print "---------  a  ------------"
     print a 
-    txx = numpy.zeros((m, n), dtype=numpy.double)
+    txx = np.zeros((m, n), dtype=np.double)
     heateqlapl.apply(t, txx, ttop, tbottom, tleft, tright)
     print "--------- txx ------------"
     print txx
-    exp = numpy.dot(a, t.reshape((m*n, 1))).reshape((m, n))
+    exp = np.dot(a, t.reshape((m*n, 1))).reshape((m, n))
     print "--------- exp ------------"
     print exp
     diff = exp - txx

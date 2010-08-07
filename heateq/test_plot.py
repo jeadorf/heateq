@@ -3,14 +3,13 @@
 
 import time
 import solver
-from initconds import InitConds2d, const
-import numpy
+from initconds import InitConds2d, const_ones
 import cairo
 from plot import *
 
 def test_plot2d_speed():
     m, n = 30, 30
-    it = InitConds2d(m, n, bottom=const(numpy.ones((n,))))
+    it = InitConds2d(m, n, bottom=const_ones(n))
     max = 100
     imsf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
     ctx = cairo.Context(imsf)

@@ -23,24 +23,23 @@ PyObject *heateqlapl_apply(PyObject *self, PyObject *args) {
     tright = PyArray_DATA(trightarr);
     tleft = PyArray_DATA(tleftarr);
 
-    /* further speedup is possible but it seems fast enough */
     txx[0] = ttop[0] + t[n] + tleft[0] + t[1] - 4 * t[0];
     for (j = 1; j < n - 1; j++) {
         txx[j] = ttop[j] + t[n+j] + t[j-1] + t[j+1] - 4*t[j];
     }
-    txx[n-1] = ttop[n-1] + t[n+n-1] + t[n-2] + tright[0] - 4*t[n-1];
+    txx[n-1] = ttop[n-1] + t[2*n-1] + t[n-2] + tright[0] - 4*t[n-1];
     for (i = 1; i < m - 1; i++) {
         txx[i*n] = t[(i-1)*n] + t[(i+1)*n] + tleft[i] + t[i*n+1] - 4*t[i*n];
         for (j = 1; j < n - 1; j++) {
            txx[i*n+j] = t[(i-1)*n+j] + t[(i+1)*n+j] + t[i*n+j-1] + t[i*n+j+1] - 4*t[i*n+j];
         }
-        txx[i*n+n-1] = t[(i-1)*n+n-1] + t[(i+1)*n+n-1] + t[i*n+n-2] + tright[i] - 4*t[i*n+n-1];
+        txx[(i+1)*n-1] = t[i*n-1] + t[(i+2)*n-1] + t[(i+1)*n-2] + tright[i] - 4*t[(i+1)*n-1];
     }
     txx[(m-1)*n] = t[(m-2)*n] + tbottom[0] + tleft[0] + t[(m-1)*n+1] - 4*t[(m-1)*n];
     for (j = 1; j < n - 1; j++) {
         txx[(m-1)*n+j] = t[(m-2)*n+j] + tbottom[j] + t[(m-1)*n+j-1] + t[(m-1)*n+j+1]- 4*t[(m-1)*n+j];
     }
-    txx[(m-1)*n+n-1] = t[(m-2)*n+n-1] + tbottom[n-1] + t[(m-1)*n+n-2] + tright[m-1]- 4*t[(m-1)*n+n-1];
+    txx[m*n-1] = t[(m-1)*n-1] + tbottom[n-1] + t[m*n-2] + tright[m-1]- 4*t[m*n-1];
 
     return PyInt_FromLong(0);
 }

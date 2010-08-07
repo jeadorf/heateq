@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy
+import numpy as np
 import heateqlapl
 
 def solve1d(ic):
-    return numpy.linspace(ic.left(0), ic.right(0), ic.n)
+    return np.linspace(ic.left(0), ic.right(0), ic.n)
 
 def solve2d(ic):
     m, n = ic.m, ic.n
@@ -15,11 +15,11 @@ def solve2d(ic):
     tleft = ic.left(0)
     a = laplacian(m, n)
     b = laplacian_b(ttop, tbottom, tleft, tright, m, n)
-    x = numpy.linalg.solve(a, b)
+    x = np.linalg.solve(a, b)
     return x.reshape(m, n)
 
 def laplacian(m, n):
-    a = numpy.empty((m*n, m*n))
+    a = np.empty((m*n, m*n))
     for i in xrange(0, m*n):
         for j in xrange(0, m*n):
             if i == j:
@@ -31,7 +31,7 @@ def laplacian(m, n):
     return a
 
 def laplacian_b(ttop, tbottom, tleft, tright, m, n):
-    b = numpy.empty((m*n,))
+    b = np.empty((m*n,))
     for i in xrange(0, m*n):
         r = i / n
         c = i % n
@@ -53,7 +53,7 @@ def simulate1d(ic, diffy=1, delx=30, delt=0.1):
     t = ic.interior.copy()
     tm = 0
     delx2 = 1. * delx * delx
-    dt = numpy.empty((n,))
+    dt = np.empty((n,))
     left = ic.left
     right = ic.right
     while True:
@@ -71,7 +71,7 @@ def simulate2d(ic, diffy=1, delx=30,  delt=0.1):
     m, n = ic.shape()
     tm = 0
     t = ic.interior.copy()
-    dt = numpy.empty((m,n))
+    dt = np.empty((m,n))
     delx2 = 1. * delx * delx
     while True:
         yield t, tm
