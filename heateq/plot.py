@@ -42,40 +42,21 @@ class TPlot2d(gtk.DrawingArea):
             cr.paint()
         return True
 
-class TemperaturePlot(gtk.DrawingArea):
+class TPlot1d(gtk.DrawingArea):
 
-    def __init__(self, m, n, tmin, tmax, dim=1):
-        super(TemperaturePlot, self).__init__()
+    def __init__(self, tmin, tmax):
+        super(TPlot1d, self).__init__()
         self.connect("expose_event", self.expose)
-        self.m = m
-        self.n = n
         self.tmin = tmin
         self.tmax = tmax
-        self.dim = dim
-        if m > 0:
-            self.t = np.zeros((1, 1))
-            self.c_buf = np.zeros((1, 1), dtype=np.double) 
-        else:
-            self.t = np.zeros((1,))
-
-    def expose(self, widget, evt):
-        ctx = widget.window.cairo_create()
-        ctx.rectangle(evt.area.x, evt.area.y, evt.area.width, evt.area.height)
-        ctx.clip()
-        self.redraw(ctx)
-        return True
-
-    def redraw(self, ctx=None):
-        if ctx == None:
-            ctx = self.window.cairo_create()
+        # todo: what ist the default array dtype in numpy ?
+        self.t = np.zeros((1,))
+    
+    def expose(self, widg, evt):
+        cr = widg.window.cairo_create()
         rect = self.get_allocation()
-        if self.dim == 2:
-            if self.c_buf.shape != self.t.shape:
-                self.c_buf = -1. * np.ones(self.t.shape, dtype=np.double)
-            plot2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
-        else:
-            plot1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
-
+        plot1d(self.t, cr, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
+        return True
 
 def plot1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
@@ -123,7 +104,7 @@ def show_win_1d_stationary(t):
     win = gtk.Window()
     win.set_title("Temperature curve, n=%d" % (len(t)-2))
     win.set_default_size(800, 100)
-    plot = TemperaturePlot(len(t), t.min(), t.max())
+    plot = TPlot1d(t.min(), t.max())
     plot.t = t
     win.add(plot)
     win.connect("destroy", gtk.main_quit)
@@ -139,7 +120,7 @@ def show_win_2d_stationary(t):
     tmax = -sys.maxint
     tmin = min(tmin, t.min())
     tmax = max(tmax, t.max())
-    plot = TemperaturePlot(m, n, tmin, tmax, dim=2)
+    plot = TPlot2d(m, n, tmin, tmax)
     plot.t = t
     win.add(plot)
     win.connect("destroy", gtk.main_quit)
