@@ -8,6 +8,40 @@ import sys
 import numpy as np
 import heateqplot
 
+class TPlot2d(gtk.DrawingArea):
+    
+    def __init__(self, m, n, tmin, tmax):
+        super(TPlot2d, self).__init__()
+        self.connect("expose_event", self.expose)
+        self.shape = (m, n)
+        self.tmin = tmin
+        self.tmax = tmax
+        self.oldsize = None 
+        self.t = None
+
+    def set_t(self, t):
+        if t.shape == self.shape:
+            self.t = t
+        else:
+            raise ValueError("Shape of temperature value array does not fit")
+    
+    def expose(self, widg, evt):
+        cr = widg.window.cairo_create()
+        rect = self.get_allocation()
+        newsize = (rect.width, rect.height)
+        if self.oldsize == None or self.oldsize != newsize:
+            self.buffer_image = cairo.ImageSurface(cairo.FORMAT_ARGB32, newsize[0], newsize[1])
+            self.buffer_cr = cairo.Context(self.buffer_image)
+            self.oldsize = newsize
+            self.c_buf = -np.ones(self.shape, dtype=np.double)
+        if self.t != None:
+            plot2d(self.t, self.buffer_cr, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax, self.c_buf)
+            cr.rectangle(rect.x, rect.y, rect.width, rect.height)
+            cr.clip()
+            cr.set_source_surface(self.buffer_image)
+            cr.paint()
+        return True
+
 class TemperaturePlot(gtk.DrawingArea):
 
     def __init__(self, m, n, tmin, tmax, dim=1):

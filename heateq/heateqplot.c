@@ -34,8 +34,8 @@ PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
     cairo_translate(cr, x, y);
     cairo_scale(cr, 1. * w / n, 1. * h / m);
     // pixel correcture to avoid artifacts due to rounding errors
-    pxw = .5 * n / w;
-    pxh = .5 * m / h;
+    pxw = .25 * n / w;
+    pxh = .25 * m / h;
     tspan = tmax - tmin;
     c;
     if (tspan == 0) {
