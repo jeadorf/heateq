@@ -33,12 +33,12 @@ class TemperaturePlot(gtk.DrawingArea):
             ctx = self.window.cairo_create()
         rect = self.get_allocation()
         if self.dim == 2:
-            plot_2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
+            plot2d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
         else:
-            plot_1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
+            plot1d(self.t, ctx, rect.x, rect.y, rect.width, rect.height, self.tmin, self.tmax)
 
 
-def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
+def plot1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
     n = len(t)
     ctx.translate(x, y)
@@ -66,18 +66,18 @@ def plot_1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.restore()
 
 # Expose C extension
-plot_2d = heateqplot.plot2d
+plot2d = heateqplot.plot2d
 
 def gen_pdf_1d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 100)
     ctx = cairo.Context(pdf)
-    plot_1d(t, ctx, 10, 10, 580, 80, min(t), max(t))
+    plot1d(t, ctx, 10, 10, 580, 80, min(t), max(t))
     pdf.flush()
 
 def gen_pdf_2d(t, filename):
     pdf = cairo.PDFSurface(filename, 600, 600)
     ctx = cairo.Context(pdf)
-    plot_2d(t, ctx, 10, 10, 580, 580, 0, 1)
+    plot2d(t, ctx, 10, 10, 580, 580, 0, 1)
     pdf.flush()
 
 def show_win_1d_stationary(t):

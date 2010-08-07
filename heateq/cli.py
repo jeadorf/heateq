@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import solver
-from solver import InitConds2d, InitConds1d, const
+from initconds import InitConds2d, InitConds1d, const
 import plot
 import optparse
 import copy
@@ -194,8 +194,8 @@ def main():
             main_instationary_1d(opts)
 
 def main_stationary_1d(opts):
-    initconds = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]))
-    t = sol.solve1d(initconds)
+    ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]))
+    t = sol.solve1d(ic)
     if opts.pdf != None:
         plot.gen_pdf_1d(t, opts.pdf)
     else:
@@ -204,8 +204,8 @@ def main_stationary_1d(opts):
 def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
             opts.tinit = numpy.zeros((opts.n, ))
-        initconds = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
-        sim  = solver.simulate1d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
+        ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
+        sim  = solver.simulate1d(ic, opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
         tmin = min(opts.tinit)
@@ -250,8 +250,8 @@ def main_stationary_2d(opts):
         opts.tleft = numpy.zeros((m,))
     if len(opts.tright) < m:
         opts.tright = numpy.zeros((m,))
-    initconds = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
-    t = solver.solve2d(initconds)
+    ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
+    t = solver.solve2d(ic)
     if opts.pdf == None:
         plot.show_win_2d_stationary(t)
     else:
@@ -272,9 +272,9 @@ def main_instationary_2d(opts):
         tmin = min(opts.tinit.min(), opts.ttop.min(), opts.tbottom.min(), opts.tleft.min(), opts.tright.min())
         tmax = max(opts.tinit.max(), opts.ttop.max(), opts.tbottom.max(), opts.tleft.max(), opts.tright.max())
 
-        initconds = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft), opts.tinit)
+        ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft), opts.tinit)
 
-        sim = solver.simulate2d(initconds, opts.diffusivity, opts.locstep, opts.timestep)
+        sim = solver.simulate2d(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
         tplot = plot.TemperaturePlot(tmin, tmax, dim=2)
         win.add(tplot)

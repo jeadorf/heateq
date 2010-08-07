@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from solver import *
+from initconds import *
 import time
 import heateqlapl
 
@@ -21,8 +22,8 @@ def test_init_conds_2d():
     assert (ic.left(1) == 5 * b).all()
 
 def test_solve1d():
-    initconds = InitConds1d(5, const(5), const(-5))
-    t = solve1d(initconds)
+    ic = InitConds1d(5, const(5), const(-5))
+    t = solve1d(ic)
     assert t[0] == 5 
     assert abs(t[2]) < eps
     assert t[-1] == -5
@@ -31,8 +32,8 @@ def test_if_simulate1d_converges():
     ts, te = 5, -5
     t = None
     maxtm = 500
-    initconds = InitConds1d(3, const(5), const(-5), numpy.array([0, 0.2, 0.3]))
-    for tt, tm in simulate1d(initconds, 300):
+    ic = InitConds1d(3, const(5), const(-5), numpy.array([0, 0.2, 0.3]))
+    for tt, tm in simulate1d(ic, 300):
         t = tt
         if tm > maxtm:
             break
@@ -62,9 +63,9 @@ def test_speed_2d():
     st = time.clock()
     m, n = 50, 50
     bottom = const(numpy.ones((n,)))
-    initconds = InitConds2d(m, n, bottom=bottom)
+    ic = InitConds2d(m, n, bottom=bottom)
     i = 0
-    for t in simulate2d(initconds):
+    for t in simulate2d(ic):
         i += 1
         if i >= 20000:
             break

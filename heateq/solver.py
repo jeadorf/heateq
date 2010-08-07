@@ -4,66 +4,15 @@
 import numpy
 import heateqlapl
 
+def solve1d(ic):
+    return numpy.linspace(ic.left(0), ic.right(0), ic.n)
 
-class InitConds2d:
-    
-    def __init__(self, m, n, top=None, right=None, bottom=None, left=None, interior=None):
-        self.m = m
-        self.n = n
-        if top == None:
-            self.top = const(numpy.zeros((n,)))
-        else:
-            self.top = top
-        if bottom == None:
-            self.bottom = const(numpy.zeros((n,)))
-        else:
-            self.bottom = bottom 
-        if right == None:
-            self.right = const(numpy.zeros((n,)))
-        else:
-            self.right = right
-        if left == None:
-            self.left = const(numpy.zeros((n,)))
-        else:
-            self.left = left
-        if interior == None:
-            self.interior = numpy.zeros((m, n))
-        else:
-            self.interior = interior
-    
-    def shape(self):
-        return self.m, self.n
-
-class InitConds1d:
-
-    def __init__(self, n, left=None, right=None, interior=None):
-        self.n = n
-        if right == None:
-            self.right = const(0)
-        else:
-            self.right = right
-        if left == None:
-            self.left = const(0)
-        else:
-            self.left = left
-        if interior == None:
-            self.interior = numpy.zeros((n,))
-        else:
-            self.interior = interior
- 
-
-def const(val):
-    return (lambda tm: val)
-
-def solve1d(initconds):
-    return numpy.linspace(initconds.left(0), initconds.right(0), initconds.n)
-
-def solve2d(initconds):
-    m, n = initconds.m, initconds.n
-    ttop = initconds.top(0)
-    tright = initconds.right(0)
-    tbottom = initconds.bottom(0)
-    tleft = initconds.left(0)
+def solve2d(ic):
+    m, n = ic.m, ic.n
+    ttop = ic.top(0)
+    tright = ic.right(0)
+    tbottom = ic.bottom(0)
+    tleft = ic.left(0)
     a = laplacian(m, n)
     b = laplacian_b(ttop, tbottom, tleft, tright, m, n)
     x = numpy.linalg.solve(a, b)
@@ -98,15 +47,15 @@ def laplacian_b(ttop, tbottom, tleft, tright, m, n):
         b[i] = v
     return b
 
-def simulate1d(initconds, diffy=1, delx=30, delt=0.1):
-    n = initconds.n
+def simulate1d(ic, diffy=1, delx=30, delt=0.1):
+    n = ic.n
     assert n > 1
-    t = initconds.interior.copy()
+    t = ic.interior.copy()
     tm = 0
     delx2 = 1. * delx * delx
     dt = numpy.empty((n,))
-    left = initconds.left
-    right = initconds.right
+    left = ic.left
+    right = ic.right
     while True:
         yield t, tm
         # compute derivative
@@ -118,16 +67,16 @@ def simulate1d(initconds, diffy=1, delx=30, delt=0.1):
         t = t + delt * dt
         tm += delt
 
-def simulate2d(initconds, diffy=1, delx=30,  delt=0.1):
-    m, n = initconds.shape()
+def simulate2d(ic, diffy=1, delx=30,  delt=0.1):
+    m, n = ic.shape()
     tm = 0
-    t = initconds.interior.copy()
+    t = ic.interior.copy()
     dt = numpy.empty((m,n))
     delx2 = 1. * delx * delx
     while True:
         yield t, tm
         # Calculate second derivative
-        heateqlapl.apply(t, dt, initconds.top(tm), initconds.bottom(tm), initconds.left(tm), initconds.right(tm))
+        heateqlapl.apply(t, dt, ic.top(tm), ic.bottom(tm), ic.left(tm), ic.right(tm))
         # Euler
         t = t + (1. * delt * diffy / delx2) * dt
         tm += delt
