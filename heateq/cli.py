@@ -212,7 +212,7 @@ def main_instationary_1d(opts):
         tmax = max(opts.tinit)
         tmin = min(tmin, opts.tleft[0], opts.tright[0])
         tmax = max(tmax, opts.tleft[0], opts.tright[0])
-        tplot = plot.TemperaturePlot(tmin, tmax)
+        tplot = plot.TemperaturePlot(0, opts.n, tmin, tmax)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
@@ -276,7 +276,7 @@ def main_instationary_2d(opts):
 
         sim = solver.simulate2d(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
-        tplot = plot.TemperaturePlot(tmin, tmax, dim=2)
+        tplot = plot.TemperaturePlot(m, n, tmin, tmax, dim=2)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()

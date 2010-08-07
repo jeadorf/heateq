@@ -6,6 +6,7 @@ import solver
 from initconds import InitConds2d, const_ones
 import cairo
 from plot import *
+import numpy as np
 
 def test_plot2d_speed():
     m, n = 30, 30
@@ -13,17 +14,29 @@ def test_plot2d_speed():
     max = 100
     imsf = cairo.ImageSurface(cairo.FORMAT_ARGB32, 400, 400)
     ctx = cairo.Context(imsf)
+    # with buffering
+    stb = time.clock()
     i = 0
-    st = time.clock()
+    c_buf = np.zeros((m, n))
+    for t, tm in solver.simulate2d(it):
+        i += 1
+        plot2d(t, ctx, 0, 0, 400, 400, 0, 1, c_buf)
+        if i >= max:
+            break
+    ctb = time.clock()
+    # without buffering
+    stn = time.clock()
+    i = 0
     for t, tm in solver.simulate2d(it):
         i += 1
         plot2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:
             break
-    ct = time.clock()
+    ctn = time.clock()
+    
     print "plotting statistics"
-    print "time: %.3fs" % (ct - st)
-    if ct - st != 0:
-        print "frames per second: %.1f" % (i / (ct - st) )
+    print "time: %.3fs (without buffering: %.3fs)" % (ctb - stb, ctn - stn)
+    if ctb - stb > 0 and ctn - stn > 0:
+        print "frames per second: %.1f (without buffering: %.1f)" % (max / (ctb - stb), max / (ctn - stn))
     else:
         print "frames per second: n/a"
