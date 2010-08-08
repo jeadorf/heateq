@@ -18,7 +18,7 @@ def test_plot2d_speed():
     stb = time.clock()
     i = 0
     c_buf = np.zeros((m, n))
-    for t, tm in solver.simulate2d(it):
+    for t, tm in solver.simulate(it):
         i += 1
         plot2d(t, ctx, 0, 0, 400, 400, 0, 1, c_buf)
         if i >= max:
@@ -27,7 +27,7 @@ def test_plot2d_speed():
     # without buffering
     stn = time.clock()
     i = 0
-    for t, tm in solver.simulate2d(it):
+    for t, tm in solver.simulate(it):
         i += 1
         plot2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:

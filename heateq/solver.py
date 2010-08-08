@@ -3,11 +3,25 @@
 
 import numpy as np
 import heateqlapl
+import scipy.sparse.linalg.isolve
 
-def solve1d(ic):
+def solve(ic):
+    """Solve the stationary heat equation to the given boundary values. Assumes
+    that the temperature at the boundaries is constant and simply grabs the
+    temperature values at time 0.
+
+    """
+    if ic.dim == 1:
+        return _solve1d(ic)
+    elif ic.dim == 2:
+        return _solve2d(ic)
+    else:
+        raise ValueError("Unsupported dimension: %d" % ic.dim)
+
+def _solve1d(ic):
     return np.linspace(ic.left(0), ic.right(0), ic.n)
 
-def solve2d(ic):
+def _solve2d(ic):
     m, n = ic.m, ic.n
     ttop = ic.top(0)
     tright = ic.right(0)
@@ -16,9 +30,28 @@ def solve2d(ic):
     a = laplacian(m, n)
     b = laplacian_b(ttop, tbottom, tleft, tright, m, n)
     x = np.linalg.solve(a, b)
+    #x = scipy.sparse.linalg.isolve.cg(a, b)
+    print x
     return x.reshape(m, n)
 
 def laplacian(m, n):
+    """Generate a matrix that approximates the effect of the 2-dimensional Laplace operator using a five-point stencil.
+    Such a matrix with m=3, n=3 looks like this:
+
+     -4   1   0   1   0   0   0   0   0 
+      1  -4   1   0   1   0   0   0   0 
+      0   1  -4   0   0   1   0   0   0 
+      1   0   0  -4   1   0   1   0   0 
+      0   1   0   1  -4   1   0   1   0 
+      0   0   1   0   1  -4   0   0   1 
+      0   0   0   1   0   0  -4   1   0 
+      0   0   0   0   1   0   1  -4   1 
+      0   0   0   0   0   1   0   1  -4
+
+    m -- number of rows
+    n -- number of columns
+    
+    """
     a = np.empty((m*n, m*n))
     for i in xrange(0, m*n):
         for j in xrange(0, m*n):
@@ -31,6 +64,16 @@ def laplacian(m, n):
     return a
 
 def laplacian_b(ttop, tbottom, tleft, tright, m, n):
+    """Create the vector b on the right-hand side of a linear system of
+    equations Ax = b, where A is the matrix that approximates the 2-dimensional
+    Laplace operator with a five-point stencil, and x is the vector of
+    temperature values.  This vector solely depends on the number of grid
+    points and the boundary values.
+
+    m, n -- number of rows and columns
+    ttop, tright, tbottom, tleft  -- temperature values at the boundaries
+
+    """
     b = np.empty((m*n,))
     for i in xrange(0, m*n):
         r = i / n
@@ -47,37 +90,68 @@ def laplacian_b(ttop, tbottom, tleft, tright, m, n):
         b[i] = v
     return b
 
-def simulate1d(ic, diffy=1, delx=30, delt=0.1):
+def simulate(ic, dfy=1, dx=30, dt=0.1):
+    """Simulate heat diffusion in a homogeneous 2-dimensional area.
+    
+    ic  -- a description of initial values and boundary conditions
+    dfy -- thermal diffusivity
+    dx  -- grid spacing, same for both directions
+    dt  -- time-step, the period of time between two simulation states 
+
+    Choosing the right combination of values for dfy, dx, and dt is crucial
+    as to avoid oscillations.  For the magnitude of the change applied in each
+    simulation step is controlled by the factor (dfy*dt)/(dx*dx) the following
+    choices might lead to oscillations:
+
+    - large thermal diffusivity
+    - big time-steps
+    - small grid spacing
+    
+    This has severe implications.  Doubling the resolution of space requires
+    about quartering the time-step.  Note that from a computational view,
+    values for thermal diffusivity and time-step are interchangeable.  Yet,
+    diffusivity is a bound variable while timestep and grid spacing are subject
+    to available computing resources.
+
+    """
+    if ic.dim == 1:
+        return _simulate1d(ic, dfy, dx, dt)
+    elif ic.dim == 2:
+        return _simulate2d(ic, dfy, dx, dt)
+    else:
+        raise ValueError("Unsupported dimension: %d" % ic.dim)
+
+def _simulate1d(ic, dfy, dx, dt):
     n = ic.n
     assert n > 1
     t = ic.interior.copy()
     tm = 0
-    delx2 = 1. * delx * delx
-    dt = np.empty((n,))
+    dx2 = 1. * dx * dx
+    t_t = np.empty((n,))
     left = ic.left
     right = ic.right
     while True:
         yield t, tm
-        # compute derivative
-        dt[0] = diffy * (left(tm) - 2*t[0] + t[1]) / delx2
+        # Calculate t_t from current temperature values 
+        # todo dfy, dx2 aus der Schleife ausklammern 
+        t_t[0] = dfy * (left(tm) - 2*t[0] + t[1]) / dx2
         for i in xrange(1, n-1):
-            dt[i] = diffy * (t[i-1] - 2*t[i] + t[i+1]) / delx2
-        dt[n-1] = diffy * (t[n-2] - 2*t[n-1] + right(tm)) / delx2
+            t_t[i] = dfy * (t[i-1] - 2*t[i] + t[i+1]) / dx2
+        t_t[n-1] = dfy * (t[n-2] - 2*t[n-1] + right(tm)) / dx2
         # Euler
-        t = t + delt * dt
-        tm += delt
+        t = t + dt * t_t
+        tm += dt
 
-def simulate2d(ic, diffy=1, delx=30,  delt=0.1):
+def _simulate2d(ic, dfy, dx,  dt):
     m, n = ic.shape()
     tm = 0
     t = ic.interior.copy()
-    dt = np.empty((m,n))
-    delx2 = 1. * delx * delx
+    t_t = np.empty((m,n))
+    dx2 = 1. * dx * dx
     while True:
         yield t, tm
-        # Calculate second derivative
-        heateqlapl.apply(t, dt, ic.top(tm), ic.bottom(tm), ic.left(tm), ic.right(tm))
+        # Calculate t_t from current temperature values 
+        heateqlapl.apply(t, t_t, ic.top(tm), ic.bottom(tm), ic.left(tm), ic.right(tm))
         # Euler
-        t = t + (1. * delt * diffy / delx2) * dt
-        tm += delt
-
+        t = t + (1. * dfy * dt / dx2) * t_t
+        tm += dt

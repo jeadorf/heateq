@@ -11,13 +11,14 @@ PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
     PyObject *c_buf_arr = NULL;
     double *t, *c_buf = NULL;
     const PyObject *crobj;
-    double x, y, w, h, tmin, tmax, tspan;
-    double c, eps, pxw, pxh;
+    double x, y, w, h, tmin, tmax;
+    double skip_thresh = 0.01;
+    double c, eps, pxw, pxh, tspan;
     cairo_t *cr; 
     npy_intp m, n;
     int i, j;
 
-    if (!PyArg_ParseTuple(args, "OOdddddd|O", &t_arr, &crobj, &x, &y, &w, &h, &tmin, &tmax, &c_buf_arr)) {
+    if (!PyArg_ParseTuple(args, "OOdddddd|Od", &t_arr, &crobj, &x, &y, &w, &h, &tmin, &tmax, &c_buf_arr, &skip_thresh)) {
         return NULL;
     }
 
@@ -37,14 +38,13 @@ PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
     pxw = .25 * n / w;
     pxh = .25 * m / h;
     tspan = tmax - tmin;
-    c;
     if (tspan == 0) {
         tspan = 1;
     }
     cairo_rectangle(cr, 0, 0, 1 + 2*pxw, 1 + 2*pxh);
     cairo_path_t *r0 = cairo_copy_path(cr);
     cairo_new_path(cr);
-    int skip_flag = 0;
+    int skip = 0;
     for (i = 0; i < m; i++) {
         cairo_save(cr);
         for (j = 0; j < n; j++) {
@@ -55,21 +55,19 @@ PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
             // between different cairo contexts.
             if (c_buf != NULL) {
                 eps = c_buf[i*n+j] - c; 
-                if (eps < 0.01 && eps > -0.01) {
-                    skip_flag = 1;
+                if (eps < skip_thresh && eps > skip_thresh) {
+                    skip = 1;
                 } else {
-                    skip_flag = 0;
-                }
-            }
-            if (skip_flag) {
-                // cairo_set_source_rgb(cr, 0, 0, 0);
-            } else {
-                cairo_append_path(cr, r0);
-                cairo_set_source_rgb(cr, c, 0, 1 - c);
-                cairo_fill(cr);
-                if (c_buf != NULL) {
+                    skip = 0;
                     c_buf[i*n+j] = c;
                 }
+            }
+            if (!skip) {
+                cairo_append_path(cr, r0);
+                cairo_set_source_rgb(cr, c, 0, 1 - c);
+                // Considering the profiler statistics this call to cairo_fill
+                // is time-consuming and calls should be avoided if possible. 
+                cairo_fill(cr);
             }
             cairo_translate(cr, 1, 0);
         }

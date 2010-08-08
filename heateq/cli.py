@@ -195,7 +195,7 @@ def main():
 
 def main_stationary_1d(opts):
     ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]))
-    t = sol.solve1d(ic)
+    t = sol.solve(ic)
     if opts.pdf != None:
         plot.gen_pdf_1d(t, opts.pdf)
     else:
@@ -205,7 +205,7 @@ def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
             opts.tinit = np.zeros((opts.n, ))
         ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
-        sim  = solver.simulate1d(ic, opts.diffusivity, opts.locstep, opts.timestep)
+        sim  = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
         tmin = min(opts.tinit)
@@ -251,7 +251,7 @@ def main_stationary_2d(opts):
     if len(opts.tright) < m:
         opts.tright = np.zeros((m,))
     ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
-    t = solver.solve2d(ic)
+    t = solver.solve(ic)
     if opts.pdf == None:
         plot.show_win_2d_stationary(t)
     else:
@@ -271,10 +271,10 @@ def main_instationary_2d(opts):
         # todo: find better procedure to find tmin and tmax
         tmin = min(opts.tinit.min(), opts.ttop.min(), opts.tbottom.min(), opts.tleft.min(), opts.tright.min())
         tmax = max(opts.tinit.max(), opts.ttop.max(), opts.tbottom.max(), opts.tleft.max(), opts.tright.max())
+        w = lambda tt: (lambda tm: 2 * math.sin(tm / 50) * tt)
+        ic = InitConds2d(m, n, w(opts.ttop), w(opts.tright), w(opts.tbottom), w(opts.tleft), opts.tinit)
 
-        ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft), opts.tinit)
-
-        sim = solver.simulate2d(ic, opts.diffusivity, opts.locstep, opts.timestep)
+        sim = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
         tplot = plot.TPlot2d(m, n, tmin, tmax)
         win.add(tplot)
@@ -291,7 +291,7 @@ def main_instationary_2d(opts):
             old_tm = 0
             i = 0
             for t, tm in sim:
-                if time.time() - old_wtm > 1:
+                if time.time() - old_wtm > 0.15:
                     gobject.idle_add(update, t.copy())
                     old_wtm = time.time()
                 if i > 150:

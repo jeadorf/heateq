@@ -23,7 +23,7 @@ def test_init_conds_2d():
 
 def test_solve1d():
     ic = InitConds1d(5, const(5), const(-5))
-    t = solve1d(ic)
+    t = solve(ic)
     assert t[0] == 5 
     assert abs(t[2]) < eps
     assert t[-1] == -5
@@ -33,7 +33,7 @@ def test_if_simulate1d_converges():
     t = None
     maxtm = 500
     ic = InitConds1d(3, const(5), const(-5), np.array([0, 0.2, 0.3]))
-    for tt, tm in simulate1d(ic, 300):
+    for tt, tm in simulate(ic, 300):
         t = tt
         if tm > maxtm:
             break
@@ -65,7 +65,7 @@ def test_speed_2d():
     bottom = const(np.ones((n,)))
     ic = InitConds2d(m, n, bottom=bottom)
     i = 0
-    for t in simulate2d(ic):
+    for t in simulate(ic):
         i += 1
         if i >= 20000:
             break
