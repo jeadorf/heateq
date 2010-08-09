@@ -30,8 +30,6 @@ def _solve2d(ic):
     a = laplacian(m, n)
     b = laplacian_b(ttop, tbottom, tleft, tright, m, n)
     x = np.linalg.solve(a, b)
-    #x = scipy.sparse.linalg.isolve.cg(a, b)
-    print x
     return x.reshape(m, n)
 
 def laplacian(m, n):

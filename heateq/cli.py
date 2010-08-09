@@ -212,7 +212,8 @@ def main_instationary_1d(opts):
         tmax = max(opts.tinit)
         tmin = min(tmin, opts.tleft[0], opts.tright[0])
         tmax = max(tmax, opts.tleft[0], opts.tright[0])
-        tplot = plot.TPlot1d(opts.n, tmin, tmax)
+        context = plot.RenderingContext(tmin, tmax)
+        tplot = plot.TPlot1d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
@@ -255,7 +256,7 @@ def main_stationary_2d(opts):
     if opts.pdf == None:
         plot.show_win_2d_stationary(t)
     else:
-        plot.gen_pdf_2d(t, opts.pdf)
+        plot.render_pdf(t, opts.pdf)
 
 def main_instationary_2d(opts):
         m = opts.m
@@ -276,7 +277,8 @@ def main_instationary_2d(opts):
 
         sim = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
-        tplot = plot.TPlot2d(m, n, tmin, tmax)
+        context = plot.RenderingContext(tmin, tmax)
+        tplot = plot.TPlot2d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import solver
-from solver import InitConds2d, const
+from initconds import InitConds2d, const
 import plot
 import random
 import math
@@ -13,8 +13,9 @@ def kochtopf():
     m = 20 
     n = 40
     ic = InitConds2d(m, n, bottom = const(numpy.ones((n,))))
-    t = solver.solve2d(ic)
-    plot.gen_pdf_2d(t, "kochtopf.pdf")
+    t = solver.solve(ic)
+    context = plot.RenderingContext(0, 1)
+    plot.render_pdf(t, context, "kochtopf.pdf")
 
 def randomheat():
     print "generating 'randomheat'"
@@ -25,8 +26,9 @@ def randomheat():
     bottom = const(numpy.array([random.uniform(0, 1) for j in xrange(0, n) ]))
     left = const(numpy.array([random.uniform(0, 1)  for i in xrange(0, m) ]))
     ic = InitConds2d(m, n, top, right, bottom, left)
-    t = solver.solve2d(ic)
-    plot.gen_pdf_2d(t, "randomheat.pdf")
+    t = solver.solve(ic)
+    context = plot.RenderingContext(0, 1)
+    plot.render_pdf(t, context, "randomheat.pdf")
 
 def sinfun():
     print "generating 'sinfun'"
@@ -37,8 +39,9 @@ def sinfun():
     left = const(numpy.array([math.sin(math.pi * (i + n/3) / n) for i in xrange(0, m) ]))
     right = const(numpy.array([math.sin(math.pi * (i - n/3) / n) for i in xrange(0, m) ]))
     ic = InitConds2d(m, n, top, right, bottom, left)
-    t = solver.solve2d(ic)
-    plot.gen_pdf_2d(t, "sinfun.pdf")
+    t = solver.solve(ic)
+    context = plot.RenderingContext(-1, 1)
+    plot.render_pdf(t, context, "sinfun.pdf")
 
 def fireinthecorner():
     print "generating 'fireintecorner'"
@@ -61,8 +64,9 @@ def fireinthecorner():
            [0 for i in xrange(0, m) ] +
            [1 for i in xrange(0, m) ]))
     ic = InitConds2d(3*m, 3*n, top, right, bottom, left)
-    t = solver.solve2d(ic)
-    plot.gen_pdf_2d(t, "fireinthecorner.pdf")
+    t = solver.solve(ic)
+    context = plot.RenderingContext(0, 1)
+    plot.render_pdf(t, context, "fireinthecorner.pdf")
 
 
 def main():
