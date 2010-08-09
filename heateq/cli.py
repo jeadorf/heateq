@@ -3,7 +3,7 @@
 
 import solver
 from initconds import InitConds2d, InitConds1d, const
-import plot
+import render
 import optparse
 import copy
 import threading
@@ -88,7 +88,7 @@ def add_diffusivity_opt(optparser):
         action="store",
         dest="diffusivity",
         type="float",
-        default=1,
+        default=1000,
         help="Thermal diffusivity of the simulated area."
     )
 
@@ -195,11 +195,12 @@ def main():
 
 def main_stationary_1d(opts):
     ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]))
-    t = sol.solve(ic)
+    t = solver.solve(ic)
     if opts.pdf != None:
-        plot.gen_pdf_1d(t, opts.pdf)
+        context = render.RenderingContext(t.min(), t.max())
+        render.render_pdf(t, context, opts.pdf)
     else:
-        plot.show_win_1d_stationary(t)
+        render.render_win(t)
 
 def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
@@ -212,8 +213,8 @@ def main_instationary_1d(opts):
         tmax = max(opts.tinit)
         tmin = min(tmin, opts.tleft[0], opts.tright[0])
         tmax = max(tmax, opts.tleft[0], opts.tright[0])
-        context = plot.RenderingContext(tmin, tmax)
-        tplot = plot.TPlot1d(context)
+        context = render.RenderingContext(tmin, tmax)
+        tplot = render.TPlot1d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
@@ -254,9 +255,9 @@ def main_stationary_2d(opts):
     ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
     t = solver.solve(ic)
     if opts.pdf == None:
-        plot.show_win_2d_stationary(t)
+        render.render_win(t)
     else:
-        plot.render_pdf(t, opts.pdf)
+        render.render_pdf(t, opts.pdf)
 
 def main_instationary_2d(opts):
         m = opts.m
@@ -277,8 +278,8 @@ def main_instationary_2d(opts):
 
         sim = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
-        context = plot.RenderingContext(tmin, tmax)
-        tplot = plot.TPlot2d(context)
+        context = render.RenderingContext(tmin, tmax)
+        tplot = render.TPlot2d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()

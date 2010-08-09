@@ -152,12 +152,12 @@ def render1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
 
 # Expose C extension
 render2d = heateqrndr.render2d
-# todo: move doc
+
 def render(t, cr, context):
     """Render heat distribution in the simulated area.
 
         t        -- Array of temperature values.  The shape tells the renderer whether
-                    to plot a pipe or a rectangle.
+                    to render a pipe or a rectangle.
 
         cr      -- Cairo context.
 
@@ -180,9 +180,18 @@ def render_pdf(t, context, filename):
     render(t, cr, context)
     pdf.flush()
 
-def show_win_1d_stationary(t):
+def render_win(t):
+    ndims = len(t.shape)
+    if ndims == 1:
+        _show_win_1d_stationary(t)    
+    elif ndims == 2:
+        _show_win_2d_stationary(t)    
+    else:
+        raise ValueError("Unsupported dimension: %d" % ic.dim)
+
+def _show_win_1d_stationary(t):
     win = gtk.Window()
-    win.set_title("Temperature curve, n=%d" % (len(t)-2))
+    win.set_title("Temperature curve, n=%d" % len(t))
     win.set_default_size(800, 100)
     context = RenderingContext(t.min(), t.max())
     plot = TPlot1d(context)
@@ -192,7 +201,7 @@ def show_win_1d_stationary(t):
     win.show_all()
     gtk.main()
 
-def show_win_2d_stationary(t):
+def _show_win_2d_stationary(t):
     win = gtk.Window()
     m, n = len(t), len(t[0])
     win.set_title("Temperature curve, m=%d, n=%d" % (m, n))
@@ -204,7 +213,4 @@ def show_win_2d_stationary(t):
     win.connect("destroy", gtk.main_quit)
     win.show_all()
     gtk.main()
-
-if __name__ == "__main__":
-    main()
 

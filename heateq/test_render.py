@@ -5,7 +5,7 @@ import time
 import solver
 from initconds import InitConds2d, const_ones
 import cairo
-from plot import *
+from render import *
 import numpy as np
 
 def test_render2d_speed():
