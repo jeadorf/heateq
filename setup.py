@@ -4,9 +4,9 @@ import numpy
 
 m1 = Extension('heateqlapl',
                     sources = ['heateq/heateqlapl.c'])
-m2 = Extension('heateqplot',
+m2 = Extension('heateqrndr',
                     libraries=["cairo"],
-                    sources = ['heateq/heateqplot.c'])
+                    sources = ['heateq/heateqrndr.c'])
 
 setuptools.setup(name = 'Heateq',
       author='Julius Adorf',

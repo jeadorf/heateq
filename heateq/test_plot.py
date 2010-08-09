@@ -8,7 +8,7 @@ import cairo
 from plot import *
 import numpy as np
 
-def test_plot2d_speed():
+def test_render2d_speed():
     m, n = 30, 30
     it = InitConds2d(m, n, bottom=const_ones(n))
     max = 100
@@ -20,7 +20,7 @@ def test_plot2d_speed():
     c_buf = np.zeros((m, n))
     for t, tm in solver.simulate(it):
         i += 1
-        plot2d(t, ctx, 0, 0, 400, 400, 0, 1, c_buf)
+        render2d(t, ctx, 0, 0, 400, 400, 0, 1, c_buf)
         if i >= max:
             break
     ctb = time.clock()
@@ -29,7 +29,7 @@ def test_plot2d_speed():
     i = 0
     for t, tm in solver.simulate(it):
         i += 1
-        plot2d(t, ctx, 0, 0, 400, 400, 0, 1)
+        render2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:
             break
     ctn = time.clock()

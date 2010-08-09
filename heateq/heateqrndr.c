@@ -6,7 +6,27 @@
 
 static Pycairo_CAPI_t *Pycairo_CAPI;
 
-PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
+/** 
+ * Render 2-dimensional heat distribution.
+ *
+ * @param t_arr Temperature numpy array.
+ * @param crobj Cairo context.
+ * @param x     x-offset in px.
+ * @param y     y-offset in px.
+ * @param w     Width in px.
+ * @param h     Height in px.
+ * @param tblue    See RenderingContext.
+ * @param tred     See RenderingContext. 
+ * @param c_buf_arr     Provide a color buffer that might speed up the
+ *      rendering process in certain cases.  Use the same color buffer when
+ *      rendering heat distributions on the same surface and only if you know
+ *      that the surface does not "lose" its paint (which allows to selectively
+ *      repaint only those tiles that changed its color significantly).
+ *      (optional)
+ * @param skip_thresh   If the change of color in a tile is larger than
+ *      skip_thresh the tile will be redrawn.  (optional)
+ */
+PyObject *heateqrndr_render2d(PyObject *self, PyObject *args) {
     PyObject *t_arr;
     PyObject *c_buf_arr = NULL;
     double *t, *c_buf = NULL;
@@ -81,13 +101,13 @@ PyObject *heateqplot_plot2d(PyObject *self, PyObject *args) {
 }
 
 
-static PyMethodDef HeateqPlotMethods[] = {
-    {"plot2d",  heateqplot_plot2d, METH_VARARGS, "Plot a 2d temperature grid."},
+static PyMethodDef HeateqRenderMethods[] = {
+    {"render2d",  heateqrndr_render2d, METH_VARARGS, "Plot a 2d temperature grid."},
     {NULL, NULL, 0, NULL} /* Sentinel */
 };
 
-PyMODINIT_FUNC initheateqplot(void) {
+PyMODINIT_FUNC initheateqrndr(void) {
     Pycairo_IMPORT;
-    (void) Py_InitModule("heateqplot", HeateqPlotMethods);
+    (void) Py_InitModule("heateqrndr", HeateqRenderMethods);
 }
 

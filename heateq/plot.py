@@ -6,7 +6,7 @@ import gtk
 import solver
 import sys
 import numpy as np
-import heateqplot
+import heateqrndr
 
 class RenderingContext:
     """Configures the rendering process of a heat distribution."""
@@ -15,17 +15,21 @@ class RenderingContext:
         """Construct a rendering context.
 
         tblue,       -- Specify the temperature values for colors blue and red.
-        tred,           
+        tred            All temperature values less or equal than tblue are
+                        painted in pure RGB blue and all values larger or equal
+                        than tred are painted in pure RGB red.
 
         width,       -- Restrict the size of the rendered image.
         height         
 
-        squares      -- Whether to draw grid cells as squares (ignored for 1D).  Setting this flag
-                        might lead that parts of the specified canvas will not be drawn upon because 
-                        arguments 'width' and 'height' can only be interpreted as upper bounds.
+        squares      -- Whether to draw grid cells as squares (ignored for 1D).
+                        Setting this flag might lead that parts of the
+                        specified canvas will not be drawn upon because
+                        arguments 'width' and 'height' can only be interpreted
+                        as upper bounds.
 
-        interpolate  -- Enable interpolation.  If interpolation is not supported by the renderer
-                        this flag will be ignored.
+        interpolate  -- Enable interpolation.  If interpolation is not
+                        supported by the renderer this flag will be ignored.
        """
         self.tblue = tblue
         self.tred = tred
@@ -37,9 +41,10 @@ class RenderingContext:
     # TODO: not used
     # TODO: squares option ignored
     def tile_size(self, shape):
-        """Calculate tile size on the rendering surface.  A tile corresponds to one grid cell.  Given the shape of the
-        grid, the width and height and the square_tiles flag specified by this rendering context, this function returns
-        a tuple containing the maximum tile width and height.
+        """Calculate tile size on the rendering surface.  A tile corresponds to
+        one grid cell.  Given the shape of the grid, the width and height and
+        the square_tiles flag specified by this rendering context, this
+        function returns a tuple containing the maximum tile width and height.
         """
         ndims = len(shape)
         if ndims == 1:
@@ -56,9 +61,9 @@ class RenderingContext:
 
 class TPlot2d(gtk.DrawingArea):
     """A GTK drawing area that paints the distribution of heat over the
-    simulated area.  The drawing routines are buffered.  Nevertheless, redrawing
-    the simulated area is a time-consuming operation and should be kept to a
-    minimum in order to keep the GUI application responsive.
+    simulated area.  The drawing routines are buffered.  Nevertheless,
+    redrawing the simulated area is a time-consuming operation and should be
+    kept to a minimum in order to keep the GUI application responsive.
     """
     
     def __init__(self, context):
@@ -92,7 +97,7 @@ class TPlot2d(gtk.DrawingArea):
             self.oldsize = (rect.width, rect.height)
             self.c_buf = -np.ones(self.t.shape, dtype=np.double)
         if self.t != None:
-            plot2d(self.t, self.buffer_cr, rect.x, rect.y, rect.width, rect.height, self.context.tblue, self.context.tred, self.c_buf)
+            render2d(self.t, self.buffer_cr, rect.x, rect.y, rect.width, rect.height, self.context.tblue, self.context.tred, self.c_buf)
             cr.rectangle(rect.x, rect.y, rect.width, rect.height)
             cr.clip()
             cr.set_source_surface(self.buffer_image)
@@ -115,10 +120,10 @@ class TPlot1d(gtk.DrawingArea):
     def expose(self, widg, evt):
         cr = widg.window.cairo_create()
         rect = self.get_allocation()
-        plot1d(self.t, cr, rect.x, rect.y, rect.width, rect.height, self.context.tblue, self.context.tred)
+        render1d(self.t, cr, rect.x, rect.y, rect.width, rect.height, self.context.tblue, self.context.tred)
         return True
 
-def plot1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
+def render1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.save()
     n = len(t)
     ctx.translate(x, y)
@@ -146,16 +151,8 @@ def plot1d(t, ctx, x, y, w, h, tmin, tmax, interpolate=True):
     ctx.restore()
 
 # Expose C extension
-plot2d = heateqplot.plot2d
+render2d = heateqrndr.render2d
 # todo: move doc
-""" 
-        c_ buf       -- Provide a color buffer that might speed up the rendering
-                        process in certain cases.  Use the same color buffer when rendering 
-                        heat distributions on the same surface and only if you know that the
-                        surface does not "lose" its paint (which allows to selectively repaint
-                        only those tiles that changed its color significantly).
-"""
-
 def render(t, cr, context):
     """Render heat distribution in the simulated area.
 
@@ -167,13 +164,12 @@ def render(t, cr, context):
         context -- An instance of class RenderingContext.
 
     """
+    # TODO: unpack context in render1d, render2d methods
     ndims = len(t.shape)
     if ndims == 1:
-        #_render1d(t, cr, context)
-        plot1d(t, cr, 0, 0, context.width, context.height, context.tblue, context.tred, context.interpolate)
+        render1d(t, cr, 0, 0, context.width, context.height, context.tblue, context.tred, context.interpolate)
     elif ndims == 2:
-        plot2d(t, cr, 0, 0, context.width, context.height, context.tblue, context.tred)
-        #_render2d(t, cr, context)
+        render2d(t, cr, 0, 0, context.width, context.height, context.tblue, context.tred)
     else:
         raise ValueError("Unsupported dimension: %d" % ic.dim)
 
