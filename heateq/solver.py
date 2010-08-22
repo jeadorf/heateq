@@ -124,20 +124,19 @@ def _simulate1d(ic, dfy, dx, dt):
     assert n > 1
     t = ic.interior.copy()
     tm = 0
-    dx2 = 1. * dx * dx
+    da = (1. * dfy * dt) / (dx * dx)
     t_t = np.empty((n,))
     left = ic.left
     right = ic.right
     while True:
         yield t, tm
         # Calculate t_t from current temperature values 
-        # todo dfy, dx2 aus der Schleife ausklammern 
-        t_t[0] = dfy * (left(tm) - 2*t[0] + t[1]) / dx2
+        t_t[0] = left(tm) - 2*t[0] + t[1]
         for i in xrange(1, n-1):
-            t_t[i] = dfy * (t[i-1] - 2*t[i] + t[i+1]) / dx2
-        t_t[n-1] = dfy * (t[n-2] - 2*t[n-1] + right(tm)) / dx2
+            t_t[i] = t[i-1] - 2*t[i] + t[i+1]
+        t_t[n-1] = t[n-2] - 2*t[n-1] + right(tm)
         # Euler
-        t = t + dt * t_t
+        t = t + da * t_t
         tm += dt
 
 def _simulate2d(ic, dfy, dx,  dt):
@@ -145,11 +144,11 @@ def _simulate2d(ic, dfy, dx,  dt):
     tm = 0
     t = ic.interior.copy()
     t_t = np.empty((m,n))
-    dx2 = 1. * dx * dx
+    da = (1. * dfy * dt) / (dx * dx)
     while True:
         yield t, tm
         # Calculate t_t from current temperature values 
         heateqlapl.apply(t, t_t, ic.top(tm), ic.bottom(tm), ic.left(tm), ic.right(tm))
         # Euler
-        t = t + (1. * dfy * dt / dx2) * t_t
+        t = t + da * t_t
         tm += dt
