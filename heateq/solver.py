@@ -151,4 +151,6 @@ def _simulate2d(ic, dfy, dx,  dt):
         heateqlapl.apply(t, t_t, ic.top(tm), ic.bottom(tm), ic.left(tm), ic.right(tm))
         # Euler
         t = t + da * t_t
+        # Apply effect mask
+        ic.effect_mask(t, tm)
         tm += dt
