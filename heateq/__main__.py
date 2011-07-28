@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # internal package imports
-import heateq.solver
+from heateq.solver import simulate, solve
 from heateq.initconds import InitConds2d, InitConds1d, const
-import heateq.render
+from heateq.render import render1d, render2d, render_pdf, render_win, RenderingContext, TPlot1d, TPlot2d
 
 # external package imports
 import copy
@@ -198,26 +198,26 @@ def main():
 
 def main_stationary_1d(opts):
     ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]))
-    t = solver.solve(ic)
+    t = solve(ic)
     if opts.pdf != None:
-        context = render.RenderingContext(t.min(), t.max())
-        render.render_pdf(t, context, opts.pdf)
+        context = RenderingContext(t.min(), t.max())
+        render_pdf(t, context, opts.pdf)
     else:
-        render.render_win(t)
+        render_win(t)
 
 def main_instationary_1d(opts):
         if len(opts.tinit) < opts.n:
             opts.tinit = np.zeros((opts.n, ))
         ic = InitConds1d(opts.n, const(opts.tleft[0]), const(opts.tright[0]), opts.tinit)
-        sim  = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
+        sim  = simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
         win = gtk.Window()
         win.set_default_size(800, 100)
         tmin = min(opts.tinit)
         tmax = max(opts.tinit)
         tmin = min(tmin, opts.tleft[0], opts.tright[0])
         tmax = max(tmax, opts.tleft[0], opts.tright[0])
-        context = render.RenderingContext(tmin, tmax)
-        tplot = render.TPlot1d(context)
+        context = RenderingContext(tmin, tmax)
+        tplot = TPlot1d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
@@ -256,11 +256,15 @@ def main_stationary_2d(opts):
     if len(opts.tright) < m:
         opts.tright = np.zeros((m,))
     ic = InitConds2d(m, n, const(opts.ttop), const(opts.tright), const(opts.tbottom), const(opts.tleft))
-    t = solver.solve(ic)
+    t = solve(ic)
     if opts.pdf == None:
-        render.render_win(t)
+        render_win(t)
     else:
-        render.render_pdf(t, opts.pdf)
+        # todo: find better procedure to find tmin and tmax
+        tmin = min(opts.tinit.min(), opts.ttop.min(), opts.tbottom.min(), opts.tleft.min(), opts.tright.min())
+        tmax = max(opts.tinit.max(), opts.ttop.max(), opts.tbottom.max(), opts.tleft.max(), opts.tright.max())
+        context = RenderingContext(tmin, tmax)
+        render_pdf(t, context, opts.pdf)
 
 def main_instationary_2d(opts):
         m = opts.m
@@ -279,10 +283,10 @@ def main_instationary_2d(opts):
         w = lambda tt: (lambda tm: 2 * math.sin(tm / 50) * tt)
         ic = InitConds2d(m, n, w(opts.ttop), w(opts.tright), w(opts.tbottom), w(opts.tleft), opts.tinit)
 
-        sim = solver.simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
+        sim = simulate(ic, opts.diffusivity, opts.locstep, opts.timestep)
 
-        context = render.RenderingContext(tmin, tmax)
-        tplot = render.TPlot2d(context)
+        context = RenderingContext(tmin, tmax)
+        tplot = TPlot2d(context)
         win.add(tplot)
         win.connect("destroy", gtk.main_quit)
         win.show_all()
