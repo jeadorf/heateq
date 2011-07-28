@@ -38,26 +38,6 @@ class RenderingContext:
         self.squares = squares
         self.interpolate = interpolate
     
-    # TODO: not used
-    # TODO: squares option ignored
-    def tile_size(self, shape):
-        """Calculate tile size on the rendering surface.  A tile corresponds to
-        one grid cell.  Given the shape of the grid, the width and height and
-        the square_tiles flag specified by this rendering context, this
-        function returns a tuple containing the maximum tile width and height.
-        """
-        ndims = len(shape)
-        if ndims == 1:
-            return (1. * self.width / shape[1], self.height)
-        elif ndims == 2:
-            if self.squares:
-                s = min(1. * width / shape[1], 1. * height / shape[0])
-                return (s, s)
-            else:
-                return (1. * self.width / shape[1], 1. * self.height / shape[0])
-        else:
-            raise ValueError("Unsupported dimension: %d" % ic.dim)
-
 
 class TPlot2d(gtk.DrawingArea):
     """A GTK drawing area that paints the distribution of heat over the
