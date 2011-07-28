@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from solver import *
-from initconds import *
+from heateq.solver import *
+from heateq.initconds import *
 import time
 import heateqlapl
 
