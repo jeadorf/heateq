@@ -1,11 +1,32 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
+/** 
+ * Applies the (approximated) Laplace operator on the interior grid of
+ * temperature values, given the temperatures at the grid boundary.
+ * The result is 
+ *
+ * <pre>
+ *      txx = Laplace(t)
+ * </pre>
+ *
+ * See the heat equation in Bungartz2009, p. 353.
+ *
+ * @param t         the array of interior temperature values
+ * @param txx       the output array of the Laplace operator
+ * @param ttop      temperature values at the upper boundary
+ * @param tbottom   temperature values at the lower boundary
+ * @param tleft     temperature values at the left boundary
+ * @param tright    temperature values at the right boundary
+ */
 PyObject *heateqlapl_apply(PyObject *self, PyObject *args) {
+    // The method parameters as python objects
     const PyObject *tarr;
     const PyObject *txxarr;
     const PyObject *ttoparr, *tbottomarr, *tleftarr, *trightarr;
+    // The unwrapped raw data of the python objects
     double *t, *txx, *ttop, *tbottom, *tleft, *tright;
+    // Dimensions and iteration variables
     npy_intp m, n;
     int i, j;
 
@@ -16,6 +37,7 @@ PyObject *heateqlapl_apply(PyObject *self, PyObject *args) {
     m = PyArray_DIM(tarr, 0);
     n = PyArray_DIM(tarr, 1);
 
+    // Get the raw data
     t = PyArray_DATA(tarr);
     txx = PyArray_DATA(txxarr);
     ttop = PyArray_DATA(ttoparr);
@@ -23,6 +45,8 @@ PyObject *heateqlapl_apply(PyObject *self, PyObject *args) {
     tright = PyArray_DATA(trightarr);
     tleft = PyArray_DATA(tleftarr);
 
+    // Apply the (approximate) Laplace operator on the matrix of interior
+    // temperature values. The boundaries need special treatment.
     txx[0] = ttop[0] + t[n] + tleft[0] + t[1] - 4 * t[0];
     for (j = 1; j < n - 1; j++) {
         txx[j] = ttop[j] + t[n+j] + t[j-1] + t[j+1] - 4*t[j];
