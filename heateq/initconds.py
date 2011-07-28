@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# external package imports
 import numpy as np
 
 def nop_mask(t, tm):

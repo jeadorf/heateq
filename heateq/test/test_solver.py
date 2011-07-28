@@ -1,10 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from heateq.solver import *
-from heateq.initconds import *
-import time
+# internal package imports
 import heateqlapl
+from heateq.solver import solve, simulate, laplacian, laplacian_b
+from heateq.initconds import InitConds1d, InitConds2d, const
+
+# external package imports
+import numpy as np
+import time
 
 eps = 1.e-8
 

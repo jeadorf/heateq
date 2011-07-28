@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# internal package imports
+import heateqrndr
+
+# external package imports
 import cairo
 import gtk
+import numpy as np
 import solver
 import sys
-import numpy as np
-import heateqrndr
 
 class RenderingContext:
     """Configures the rendering process of a heat distribution."""

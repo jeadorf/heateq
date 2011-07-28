@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import solver
-from initconds import InitConds2d, InitConds1d, const
-import render
-import optparse
+# internal package imports
+import heateq.solver
+from heateq.initconds import InitConds2d, InitConds1d, const
+import heateq.render
+
+# external package imports
 import copy
-import threading
 import gobject
 import gtk
-import time
-import sys
 import math
 import numpy as np
+import optparse
+import sys
+import threading
+import time
 
 def add_stationary_opt(optparser):
     optparser.add_option(

@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
+# internal package imports
 import heateqlapl
+
+# external package imports
+import numpy as np
 import scipy.sparse.linalg.isolve
 
 def solve(ic):

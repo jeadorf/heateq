@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-print __name__
-
-import time
-import heateq.solver
+# internal package imports
+from heateq.solver import simulate
+from heateq.render import render2d
 from heateq.initconds import InitConds2d, const_ones
+
+# external package imports
 import cairo
-from heateq.render import *
 import numpy as np
+import time
 
 def test_render2d_speed():
     m, n = 30, 30
@@ -21,7 +21,7 @@ def test_render2d_speed():
     stb = time.clock()
     i = 0
     c_buf = np.zeros((m, n))
-    for t, tm in solver.simulate(it):
+    for t, tm in simulate(it):
         i += 1
         render2d(t, ctx, 0, 0, 400, 400, 0, 1, c_buf)
         if i >= max:
@@ -30,7 +30,7 @@ def test_render2d_speed():
     # without buffering
     stn = time.clock()
     i = 0
-    for t, tm in solver.simulate(it):
+    for t, tm in simulate(it):
         i += 1
         render2d(t, ctx, 0, 0, 400, 400, 0, 1)
         if i >= max:

@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import solver
-from initconds import InitConds2d, const
-import render
-import random
+# internal package imports
+import heateq.render
+import heateq.solver
+from heateq.initconds import InitConds2d, const
+
+# external package imports
 import math
 import numpy
+import random
 
 def kochtopf():
     print "generating 'kochtopf'"
