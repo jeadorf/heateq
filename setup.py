@@ -10,7 +10,7 @@ m2 = Extension('heateqrndr',
 
 setuptools.setup(name = 'Heateq',
       author='Julius Adorf',
-      version = '0.1',
+      version = '0.1.dev',
       description = 'Heat equation simulator',
       include_dirs=[numpy.get_include(), '/usr/include/cairo'],
       entry_points = {
